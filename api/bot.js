@@ -3,7 +3,7 @@
 
 const BOT_TOKEN = '8763377927:AAE43INuRksUN1HSImP6HcsF4Q47M8sw6Y8'; // <- your token (revoke this later!)
 const APP_URL = 'https://deshi-income-bot.vercel.app';        // your mini app URL from config.js
-const PAYMENT_CHANNEL = 'https://t.me/mishti_kumra_official';
+const PAYMENT_CHANNEL = 'https://t.me/deshiincomeofficial';
 
 export default async function handler(req, res) {
   // Only accept POST requests from Telegram
