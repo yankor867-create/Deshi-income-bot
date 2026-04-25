@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>দৈনিক বোনাস | দেশী ইনকাম</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="min-h-screen pb-24">
+
+  <div id="countdownOverlay" class="countdown-overlay">
+    <div style="text-align:center;padding:32px;">
+      <div style="width:60px;height:60px;background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.3);border-radius:18px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+        <i class="fas fa-calendar-alt" style="color:var(--violet);font-size:26px;"></i>
+      </div>
+      <div class="countdown-ring" style="margin:0 auto 20px;">
+        <svg width="180" height="180" viewBox="0 0 180 180">
+          <circle cx="90" cy="90" r="80" fill="none" stroke="rgba(139,92,246,0.1)" stroke-width="6"/>
+          <circle id="countdownCircle" cx="90" cy="90" r="80" fill="none" stroke="var(--violet)" stroke-width="6"
+                  stroke-linecap="round" stroke-dasharray="502" stroke-dashoffset="0"
+                  transform="rotate(-90 90 90)" style="transition:stroke-dashoffset 1s linear;"/>
+        </svg>
+        <div class="countdown-number" id="countdownNumber" style="color:var(--violet);">30</div>
+      </div>
+      <p style="color:var(--text-primary);font-size:16px;font-weight:600;">দৈনিক বোনাস এড দেখুন...</p>
+      <p style="color:var(--text-muted);font-size:13px;margin-top:6px;">৩০ সেকেন্ড অপেক্ষা করুন</p>
+    </div>
+  </div>
+
+  <div class="container mx-auto px-4 py-5">
+    <div class="flex items-center gap-3 mb-5 fade-up fade-up-1">
+      <a href="tasks.html" style="width:40px;height:40px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);text-decoration:none;">
+        <i class="fas fa-arrow-left"></i>
+      </a>
+      <div>
+        <h1 style="font-size:20px;font-weight:700;color:var(--text-primary);">দৈনিক বোনাস</h1>
+        <p style="font-size:12px;color:var(--text-muted);">প্রতিদিন ২৫০ টাকা পর্যন্ত</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-3 gap-3 mb-5 fade-up fade-up-2">
+      <div class="stat-card" style="border-color:rgba(139,92,246,0.2);">
+        <p style="font-size:10px;color:var(--text-muted);margin-bottom:4px;">দেখেছেন</p>
+        <p style="font-size:22px;font-weight:800;color:var(--violet);" id="dailyCounter">0</p>
+        <p style="font-size:10px;color:var(--text-dim);">/50 এড</p>
+      </div>
+      <div class="stat-card">
+        <p style="font-size:10px;color:var(--text-muted);margin-bottom:4px;">আয় করেছেন</p>
+        <p style="font-size:22px;font-weight:800;color:var(--text-primary);" id="earnedToday">0</p>
+        <p style="font-size:10px;color:var(--text-dim);">টাকা</p>
+      </div>
+      <div class="stat-card" style="border-color:rgba(245,200,66,0.15);">
+        <p style="font-size:10px;color:var(--text-muted);margin-bottom:4px;">বাকি আছে</p>
+        <p style="font-size:22px;font-weight:800;" class="text-gold" id="remaining">50</p>
+        <p style="font-size:10px;color:var(--text-dim);">এড</p>
+      </div>
+    </div>
+
+    <div class="glass-card p-5 mb-5 fade-up fade-up-2">
+      <div class="flex justify-between items-center mb-3">
+        <p style="font-size:13px;color:var(--text-muted);">আজকের অগ্রগতি</p>
+        <span class="badge badge-violet" id="pctBadge">0%</span>
+      </div>
+      <div class="progress-track" style="height:8px;">
+        <div id="dailyProgressFill" class="progress-fill progress-violet" style="width:0%"></div>
+      </div>
+      <p style="font-size:11px;color:var(--text-dim);margin-top:8px;text-align:right;" id="resetTimer">রিসেট: কাল সকাল</p>
+    </div>
+
+    <button onclick="window.watchDailyBonus()" id="watchBtn" class="btn-violet w-full fade-up fade-up-3" style="font-size:16px;padding:18px;border-radius:18px;">
+      🌟 দৈনিক বোনাস এড দেখুন — <span id="dailyBtnReward">3</span> ৳
+    </button>
+
+    <div class="glass-card-dark p-4 mt-4 fade-up fade-up-4">
+      <div class="flex items-center gap-3">
+        <i class="fas fa-info-circle" style="color:var(--violet);font-size:18px;flex-shrink:0;"></i>
+        <p style="font-size:12px;color:var(--text-muted);">প্রতিটি দৈনিক এডে ৩০ সেকেন্ড অপেক্ষা করুন। প্রতিদিন সর্বোচ্চ <strong style="color:var(--text-primary);">২৫০ টাকা</strong> আয় করতে পারবেন।</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-client.js"></script>
+  <script src="app.js"></script>
+  <script>
+    const DAILY_REWARD = window.CONFIG.DAILY_BONUS_REWARD || 3;
+    document.getElementById('dailyBtnReward').textContent = DAILY_REWARD;
+
+    let countdownInterval, adOpened = false;
+    const TOTAL = 30, CIRCUMFERENCE = 502;
+
+    function updatePageUI() {
+      const count = window.getDailyBonusCount ? window.getDailyBonusCount() : parseInt(localStorage.getItem('daily_bonus_ads')||'0');
+      const remaining = 50 - count;
+      const pct = Math.round((count / 50) * 100);
+      document.getElementById('dailyCounter').textContent = count;
+      document.getElementById('earnedToday').textContent = count * DAILY_REWARD;
+      document.getElementById('remaining').textContent = remaining;
+      document.getElementById('dailyProgressFill').style.width = `${pct}%`;
+      document.getElementById('pctBadge').textContent = `${pct}%`;
+      const btn = document.getElementById('watchBtn');
+      if (count >= 50) {
+        btn.disabled = true;
+        btn.innerHTML = '❌ আজকের লিমিট শেষ! কাল আবার চেষ্টা করুন';
+        btn.style.opacity = '0.5';
+      }
+    }
+
+    async function watchDailyBonus() {
+      const user = getCurrentUser();
+      if (!user) { alert('ডেটা লোড হয়নি!'); return; }
+      const count = window.getDailyBonusCount ? window.getDailyBonusCount() : parseInt(localStorage.getItem('daily_bonus_ads')||'0');
+      if (count >= 50) { alert('❌ আজকের লিমিট শেষ! কাল আবার চেষ্টা করুন।'); return; }
+      if (adOpened) { alert('এড ইতিমধ্যে খোলা আছে!'); return; }
+
+      const btn = document.getElementById('watchBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> খোলা হচ্ছে...';
+      
+      const link = window.CONFIG.AD_LINKS[Math.floor(Math.random() * window.CONFIG.AD_LINKS.length)];
+      
+      const a = document.createElement('a');
+      a.href = link;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      
+      adOpened = true;
+
+      document.getElementById('countdownOverlay').style.display = 'flex';
+      let seconds = TOTAL;
+      const numEl = document.getElementById('countdownNumber');
+      const circEl = document.getElementById('countdownCircle');
+      numEl.textContent = seconds;
+
+      countdownInterval = setInterval(() => {
+        seconds--;
+        numEl.textContent = seconds;
+        circEl.style.strokeDashoffset = ((TOTAL - seconds) / TOTAL) * CIRCUMFERENCE;
+        if (seconds <= 0) { clearInterval(countdownInterval); finishDailyBonus(); }
+      }, 1000);
+    }
+
+    async function finishDailyBonus() {
+      document.getElementById('countdownOverlay').style.display = 'none';
+      const result = await window.addDailyBonusEarning(DAILY_REWARD);
+      updatePageUI();
+      if (result && result.success) {
+        alert(`✅ ${DAILY_REWARD} টাকা যোগ হয়েছে!`);
+        const count = window.getDailyBonusCount ? window.getDailyBonusCount() : parseInt(localStorage.getItem('daily_bonus_ads')||'0');
+        if (count < 50) {
+          document.getElementById('watchBtn').disabled = false;
+          document.getElementById('watchBtn').innerHTML = `🌟 দৈনিক বোনাস এড দেখুন — ${DAILY_REWARD} ৳`;
+        }
+      } else {
+        alert(result?.error || '❌ কোনো সমস্যা হয়েছে।');
+        document.getElementById('watchBtn').disabled = false;
+        document.getElementById('watchBtn').innerHTML = `🌟 দৈনিক বোনাস এড দেখুন — ${DAILY_REWARD} ৳`;
+      }
+      adOpened = false;
+    }
+
+    window.watchDailyBonus = watchDailyBonus;
+    window.updatePageUI = updatePageUI;
+
+    document.addEventListener('DOMContentLoaded', () => { updatePageUI(); });
+  </script>
+</body>
+</html>

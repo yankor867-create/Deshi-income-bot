@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>পেজ পাওয়া যায়নি | দেশী ইনকাম</title>
+    <script>
+        // Redirect to home page after 2 seconds
+        setTimeout(() => {
+            window.location.href = '/index.html';
+        }, 2000);
+    </script>
+    <style>
+        body {
+            background: #060B18;
+            color: #F0F4FF;
+            font-family: 'Hind Siliguri', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            text-align: center;
+            max-width: 400px;
+        }
+        h1 {
+            font-size: 72px;
+            margin: 0;
+            background: linear-gradient(135deg, #F5C842, #FFE17A);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        p {
+            color: rgba(240,244,255,0.7);
+            margin: 20px 0;
+        }
+        .home-link {
+            display: inline-block;
+            background: linear-gradient(135deg, #F5C842, #FFE17A);
+            color: #0A0800;
+            padding: 12px 24px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>404</h1>
+        <p>পেজটি পাওয়া যায়নি। হোম পেজে নিয়ে যাওয়া হচ্ছে...</p>
+        <a href="/index.html" class="home-link">হোম পেজে যান</a>
+    </div>
+</body>
+</html>

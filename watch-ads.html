@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>এড দেখুন | দেশী ইনকাম</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="min-h-screen pb-24">
+
+  <div id="countdownOverlay" class="countdown-overlay" style="display:none;">
+    <div style="text-align:center;padding:32px;">
+      <div style="width:60px;height:60px;background:rgba(0,212,168,0.1);border:1px solid rgba(0,212,168,0.3);border-radius:18px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+        <i class="fas fa-hourglass-half" style="color:var(--emerald);font-size:26px;"></i>
+      </div>
+      <div class="countdown-ring" style="margin:0 auto 20px;">
+        <svg width="180" height="180" viewBox="0 0 180 180">
+          <circle cx="90" cy="90" r="80" fill="none" stroke="rgba(0,212,168,0.1)" stroke-width="6"/>
+          <circle id="countdownCircle" cx="90" cy="90" r="80" fill="none" stroke="var(--emerald)" stroke-width="6"
+                  stroke-linecap="round" stroke-dasharray="502" stroke-dashoffset="0"
+                  transform="rotate(-90 90 90)" style="transition:stroke-dashoffset 1s linear;"/>
+        </svg>
+        <div class="countdown-number" id="countdownNumber" style="color:var(--emerald);">15</div>
+      </div>
+      <p style="color:var(--text-primary);font-size:16px;font-weight:600;">এড দেখুন...</p>
+      <p style="color:var(--text-muted);font-size:13px;margin-top:6px;">পেজে ফিরে আসুন</p>
+    </div>
+  </div>
+
+  <div class="container mx-auto px-4 py-5">
+    <div class="flex items-center gap-3 mb-5 fade-up fade-up-1">
+      <a href="tasks.html" style="width:40px;height:40px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);text-decoration:none;">
+        <i class="fas fa-arrow-left"></i>
+      </a>
+      <div>
+        <h1 style="font-size:20px;font-weight:700;color:var(--text-primary);">প্রধান এড</h1>
+        <p style="font-size:12px;color:var(--text-muted);">প্রতি এডে <span id="rewardTextInTitle">10</span> টাকা আয় করুন</p>
+      </div>
+    </div>
+
+    <div class="glass-card p-6 mb-5 text-center fade-up fade-up-2">
+      <div style="position:relative;width:160px;height:160px;margin:0 auto 16px;">
+        <svg width="160" height="160" viewBox="0 0 160 160" style="position:absolute;top:0;left:0;">
+          <circle cx="80" cy="80" r="70" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="8"/>
+          <circle id="progressCircle" cx="80" cy="80" r="70" fill="none" stroke="var(--emerald)" stroke-width="8"
+                  stroke-linecap="round" stroke-dasharray="440" stroke-dashoffset="440"
+                  transform="rotate(-90 80 80)" style="transition:stroke-dashoffset 0.6s ease;"/>
+        </svg>
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+          <div style="font-size:42px;font-weight:800;font-family:'Sora',sans-serif;color:var(--text-primary);" id="adsCounter">0</div>
+          <div style="font-size:13px;color:var(--text-muted);">/10 এড</div>
+        </div>
+      </div>
+      <div class="badge badge-emerald mx-auto mb-3" id="watchAdBadge">প্রতি এডে 10 টাকা</div>
+      <p style="font-size:12px;color:var(--text-dim);" id="resetTimer">পরবর্তী রিসেট: গণনা হচ্ছে...</p>
+    </div>
+
+    <div class="glass-card p-5 mb-5 fade-up fade-up-3">
+      <div class="flex justify-between items-center">
+        <div>
+          <p style="font-size:12px;color:var(--text-muted);">এই ঘন্টায় সম্ভাব্য আয়</p>
+          <p style="font-size:28px;font-weight:800;font-family:'Sora',sans-serif;" class="text-emerald" id="potentialEarning">০ ৳</p>
+        </div>
+        <div style="text-align:right;">
+          <p style="font-size:12px;color:var(--text-muted);">বাকি আছে</p>
+          <p style="font-size:28px;font-weight:800;font-family:'Sora',sans-serif;color:var(--text-primary);" id="remaining">১০</p>
+          <p style="font-size:11px;color:var(--text-dim);">এড</p>
+        </div>
+      </div>
+    </div>
+
+    <button id="watchBtn" class="btn-emerald w-full fade-up fade-up-4" style="font-size:16px;padding:18px;border-radius:18px;">
+      🎬 এড দেখুন — <span id="watchBtnReward">10</span> ৳ আয় করুন
+    </button>
+
+    <div class="glass-card-dark p-4 mt-5 fade-up fade-up-4">
+      <h4 style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:10px;">📌 নির্দেশনা</h4>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;gap:8px;align-items:flex-start;">
+          <span style="color:var(--emerald);font-size:12px;margin-top:1px;">✓</span>
+          <p style="font-size:12px;color:var(--text-muted);">বাটন চাপুন, এড দেখুন</p>
+        </div>
+        <div style="display:flex;gap:8px;align-items:flex-start;">
+          <span style="color:var(--emerald);font-size:12px;margin-top:1px;">✓</span>
+          <p style="font-size:12px;color:var(--text-muted);">১৫ সেকেন্ড কাউন্টডাউন শেষ হলে টাকা যোগ হবে</p>
+        </div>
+        <div style="display:flex;gap:8px;align-items:flex-start;">
+          <span style="color:var(--emerald);font-size:12px;margin-top:1px;">✓</span>
+          <p style="font-size:12px;color:var(--text-muted);">প্রতি ঘন্টায় সর্বোচ্চ ১০টি এড দেখা যাবে</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-client.js"></script>
+  <script src="app.js"></script>
+  <script>
+    const tg = window.Telegram?.WebApp;
+    let countdownInterval = null;
+    let adOpened = false;
+    const TOTAL = 15;
+    const CIRCUMFERENCE = 502;
+    const AD_REWARD = window.CONFIG.AD_REWARD || 10;
+
+    // Set dynamic texts
+    document.getElementById('watchAdBadge').textContent = `প্রতি এডে ${AD_REWARD} টাকা`;
+    document.getElementById('watchBtnReward').textContent = AD_REWARD;
+    document.getElementById('rewardTextInTitle').textContent = AD_REWARD;
+
+    if (tg) {
+      tg.ready();
+      tg.expand();
+    }
+
+    function getTimeUntilNextHour() {
+      const now = new Date();
+      const next = new Date(now);
+      next.setHours(now.getHours() + 1, 0, 0, 0);
+      const m = Math.floor((next - now) / 60000);
+      return m > 60 ? `${Math.floor(m / 60)}ঘ ${m % 60}মি` : `${m} মিনিট`;
+    }
+
+    async function checkAndResetHourly() {
+      const user = window.getCurrentUser ? window.getCurrentUser() : null;
+      if (!user) return;
+      
+      const lastReset = user.last_ad_reset ? new Date(user.last_ad_reset) : null;
+      const now = new Date();
+      
+      if (!lastReset || (now - lastReset) > 3600000) {
+        localStorage.setItem('hourly_ads_watched', '0');
+        localStorage.setItem('last_ad_reset_hour', now.getHours().toString());
+        
+        try {
+          await window.supabase
+            .from('users')
+            .update({ 
+              today_ads: 0,
+              last_ad_reset: now.toISOString() 
+            })
+            .eq('id', user.id);
+          
+          user.today_ads = 0;
+          user.last_ad_reset = now.toISOString();
+        } catch (e) {
+          console.error('Reset error:', e);
+        }
+      }
+    }
+
+    function getHourlyAdsCount() {
+      const h = new Date().getHours().toString();
+      if (localStorage.getItem('last_ad_reset_hour') !== h) {
+        localStorage.setItem('hourly_ads_watched', '0');
+        localStorage.setItem('last_ad_reset_hour', h);
+      }
+      return parseInt(localStorage.getItem('hourly_ads_watched') || '0');
+    }
+
+    async function updateUI() {
+      await checkAndResetHourly();
+      const count = getHourlyAdsCount();
+      const remaining = 10 - count;
+      document.getElementById('adsCounter').textContent = count;
+      document.getElementById('remaining').textContent = remaining;
+      document.getElementById('potentialEarning').textContent = `${remaining * AD_REWARD} ৳`;
+      const offset = 440 - (count / 10) * 440;
+      document.getElementById('progressCircle').style.strokeDashoffset = offset;
+      document.getElementById('resetTimer').textContent = `পরবর্তী রিসেট: ${getTimeUntilNextHour()}`;
+      
+      const btn = document.getElementById('watchBtn');
+      if (count >= 10) {
+        btn.disabled = true;
+        btn.innerHTML = '❌ এই ঘন্টায় লিমিট শেষ';
+        btn.style.opacity = '0.5';
+      } else {
+        btn.disabled = false;
+        btn.innerHTML = `🎬 এড দেখুন — ${AD_REWARD} ৳ আয় করুন`;
+        btn.style.opacity = '1';
+      }
+    }
+
+    function openAdLink() {
+      const links = window.CONFIG?.AD_LINKS || [];
+      const link = links[Math.floor(Math.random() * links.length)];
+      
+      const a = document.createElement('a');
+      a.href = link;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    async function watchAd() {
+      const user = window.getCurrentUser ? window.getCurrentUser() : null;
+      if (!user) {
+        const msg = 'ডেটা লোড হয়নি! পেজ রিফ্রেশ করুন।';
+        if (tg) tg.showAlert(msg);
+        else alert(msg);
+        return;
+      }
+      
+      await checkAndResetHourly();
+      const count = getHourlyAdsCount();
+      
+      if (count >= 10) {
+        const msg = 'এই ঘন্টায় লিমিট শেষ!';
+        if (tg) tg.showAlert(msg);
+        else alert(msg);
+        return;
+      }
+      
+      if (adOpened) {
+        const msg = 'এড ইতিমধ্যে খোলা আছে!';
+        if (tg) tg.showAlert(msg);
+        else alert(msg);
+        return;
+      }
+
+      const btn = document.getElementById('watchBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> খোলা হচ্ছে...';
+
+      openAdLink();
+      adOpened = true;
+
+      document.getElementById('countdownOverlay').style.display = 'flex';
+      let seconds = TOTAL;
+      const numEl = document.getElementById('countdownNumber');
+      const circEl = document.getElementById('countdownCircle');
+      numEl.textContent = seconds;
+      circEl.style.strokeDashoffset = '0';
+
+      if (countdownInterval) clearInterval(countdownInterval);
+      
+      countdownInterval = setInterval(() => {
+        seconds--;
+        numEl.textContent = seconds;
+        const offset = ((TOTAL - seconds) / TOTAL) * CIRCUMFERENCE;
+        circEl.style.strokeDashoffset = offset;
+        
+        if (seconds <= 0) {
+          clearInterval(countdownInterval);
+          countdownInterval = null;
+          finishAd();
+        }
+      }, 1000);
+    }
+
+    async function finishAd() {
+      document.getElementById('countdownOverlay').style.display = 'none';
+      
+      const currentCount = getHourlyAdsCount();
+      localStorage.setItem('hourly_ads_watched', (currentCount + 1).toString());
+      
+      const result = await window.addEarning(AD_REWARD);
+      await updateUI();
+      
+      if (result && result.success) {
+        const newCount = getHourlyAdsCount();
+        const msg = `✅ ${AD_REWARD} টাকা যোগ হয়েছে! এই ঘন্টায় ${newCount}/10`;
+        if (tg) tg.showAlert(msg);
+        else alert(msg);
+      } else {
+        localStorage.setItem('hourly_ads_watched', currentCount.toString());
+        const msg = result?.error || '❌ কোনো সমস্যা হয়েছে।';
+        if (tg) tg.showAlert(msg);
+        else alert(msg);
+      }
+      
+      adOpened = false;
+    }
+
+    let attempts = 0;
+    async function waitForUser() {
+      const user = window.getCurrentUser ? window.getCurrentUser() : null;
+      if (user && user.id) {
+        await updateUI();
+      } else if (attempts < 30) {
+        attempts++;
+        setTimeout(waitForUser, 200);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('watchBtn').addEventListener('click', watchAd);
+      waitForUser();
+      setInterval(updateUI, 30000);
+    });
+  </script>
+</body>
+</html>

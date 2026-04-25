@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>টাস্ক | দেশী ইনকাম</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="min-h-screen pb-24">
+
+  <div class="container mx-auto px-4 py-5">
+
+    <!-- Header -->
+    <div class="flex items-center gap-3 mb-5 fade-up fade-up-1">
+      <div style="width:44px;height:44px;background:rgba(0,212,168,0.1);border:1px solid rgba(0,212,168,0.2);border-radius:14px;display:flex;align-items:center;justify-content:center;">
+        <i class="fas fa-tasks" style="color:var(--emerald);font-size:18px;"></i>
+      </div>
+      <div>
+        <h1 style="font-size:20px;font-weight:700;color:var(--text-primary);">টাস্ক</h1>
+        <p style="font-size:12px;color:var(--text-muted);">কাজ করে আয় করুন</p>
+      </div>
+    </div>
+
+    <!-- Main Ads Card -->
+    <div class="task-card emerald-glow p-5 mb-4 fade-up fade-up-2">
+      <div class="flex justify-between items-center mb-4">
+        <div class="flex items-center gap-3">
+          <div style="width:44px;height:44px;background:rgba(0,212,168,0.1);border-radius:14px;display:flex;align-items:center;justify-content:center;">
+            <i class="fas fa-play-circle" style="color:var(--emerald);font-size:20px;"></i>
+          </div>
+          <div>
+            <h3 style="font-size:15px;font-weight:700;color:var(--text-primary);">প্রধান এড</h3>
+            <p style="font-size:11px;color:var(--text-muted);">প্রতি ঘন্টায় ১০টি</p>
+          </div>
+        </div>
+        <span class="badge badge-emerald" id="taskMainReward">10 ৳ / এড</span>
+      </div>
+
+      <div class="mb-4">
+        <div class="flex justify-between mb-2">
+          <span style="font-size:12px;color:var(--text-muted);">এই ঘন্টার অগ্রগতি</span>
+          <span style="font-size:12px;font-weight:600;color:var(--emerald);"><span id="todayAdsCount">0</span>/10</span>
+        </div>
+        <div class="progress-track">
+          <div id="progressFill" class="progress-fill progress-emerald" style="width:0%"></div>
+        </div>
+        <p style="font-size:10px;color:var(--text-dim);margin-top:6px;">রিসেট: <span id="resetTimer">--</span></p>
+      </div>
+
+      <a href="watch-ads.html" style="text-decoration:none;display:block;">
+        <button class="btn-emerald w-full" style="font-size:15px;">
+          🎬 এড দেখুন
+        </button>
+      </a>
+    </div>
+
+    <!-- Bonus Ads Card -->
+    <div class="task-card gold-glow p-5 mb-4 fade-up fade-up-2">
+      <div class="flex justify-between items-center mb-4">
+        <div class="flex items-center gap-3">
+          <div style="width:44px;height:44px;background:rgba(245,200,66,0.1);border-radius:14px;display:flex;align-items:center;justify-content:center;">
+            <i class="fas fa-star" style="color:var(--gold);font-size:20px;"></i>
+          </div>
+          <div>
+            <h3 style="font-size:15px;font-weight:700;color:var(--text-primary);">বোনাস এড</h3>
+            <p style="font-size:11px;color:var(--text-muted);">প্রতি ঘন্টায় ১০টি</p>
+          </div>
+        </div>
+        <span class="badge badge-gold" id="taskBonusReward">5 ৳ / এড</span>
+      </div>
+
+      <div class="mb-4">
+        <div class="flex justify-between mb-2">
+          <span style="font-size:12px;color:var(--text-muted);">এই ঘন্টার অগ্রগতি</span>
+          <span style="font-size:12px;font-weight:600;color:var(--gold);"><span id="bonusAdsCount">0</span>/10</span>
+        </div>
+        <div class="progress-track">
+          <div id="bonusProgressFill" class="progress-fill progress-gold" style="width:0%"></div>
+        </div>
+      </div>
+
+      <a href="bonus-ads.html" style="text-decoration:none;display:block;">
+        <button class="btn-primary w-full" style="font-size:15px;">
+          ⭐ বোনাস এড দেখুন
+        </button>
+      </a>
+    </div>
+
+    <!-- Daily Bonus Card -->
+    <div class="task-card violet-glow p-5 mb-4 fade-up fade-up-3">
+      <div class="flex justify-between items-center mb-4">
+        <div class="flex items-center gap-3">
+          <div style="width:44px;height:44px;background:rgba(139,92,246,0.12);border-radius:14px;display:flex;align-items:center;justify-content:center;">
+            <i class="fas fa-calendar-day" style="color:var(--violet);font-size:20px;"></i>
+          </div>
+          <div>
+            <h3 style="font-size:15px;font-weight:700;color:var(--text-primary);">দৈনিক বোনাস</h3>
+            <p style="font-size:11px;color:var(--text-muted);">প্রতিদিন ৫০টি</p>
+          </div>
+        </div>
+        <span class="badge badge-violet" id="taskDailyReward">3 ৳ / এড</span>
+      </div>
+
+      <div class="mb-4">
+        <div class="flex justify-between mb-2">
+          <span style="font-size:12px;color:var(--text-muted);">আজকের অগ্রগতি</span>
+          <span style="font-size:12px;font-weight:600;color:var(--violet);"><span id="dailyBonusCount">0</span>/50</span>
+        </div>
+        <div class="progress-track">
+          <div id="dailyBonusProgress" class="progress-fill progress-violet" style="width:0%"></div>
+        </div>
+        <p style="font-size:10px;color:var(--text-dim);margin-top:6px;">রিসেট: কাল</p>
+      </div>
+
+      <a href="daily-bonus.html" style="text-decoration:none;display:block;">
+        <button class="btn-violet w-full" style="font-size:15px;">
+          🌟 দৈনিক বোনাস
+        </button>
+      </a>
+    </div>
+
+    <!-- Social Tasks -->
+    <p style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px;" class="fade-up fade-up-3">সোশ্যাল টাস্ক</p>
+
+    <div class="task-card p-5 mb-3 fade-up fade-up-4" style="border-color:rgba(29,161,242,0.2);">
+      <div class="flex items-center gap-3 mb-3">
+        <div style="width:44px;height:44px;background:rgba(29,161,242,0.1);border-radius:14px;display:flex;align-items:center;justify-content:center;">
+          <i class="fab fa-telegram" style="color:#1DA1F2;font-size:20px;"></i>
+        </div>
+        <div style="flex:1;">
+          <h3 style="font-size:14px;font-weight:700;color:var(--text-primary);">টেলিগ্রাম চ্যানেল জয়েন</h3>
+          <p style="font-size:12px;color:var(--text-muted);">একবার করুন, ৫০ টাকা পান</p>
+        </div>
+        <span class="badge" style="background:rgba(29,161,242,0.1);color:#1DA1F2;border-color:rgba(29,161,242,0.25);">৫০ ৳</span>
+      </div>
+      <button onclick="completeTelegramTask()" id="telegramBtn"
+        style="width:100%;padding:12px;background:rgba(29,161,242,0.1);border:1px solid rgba(29,161,242,0.25);color:#1DA1F2;border-radius:12px;font-weight:600;font-size:14px;cursor:pointer;transition:all 0.3s;">
+        📢 ক্লেইম ৫০ টাকা
+      </button>
+    </div>
+
+    <div class="task-card p-5 mb-3 fade-up fade-up-4" style="border-color:rgba(255,0,0,0.2);">
+      <div class="flex items-center gap-3 mb-3">
+        <div style="width:44px;height:44px;background:rgba(255,0,0,0.08);border-radius:14px;display:flex;align-items:center;justify-content:center;">
+          <i class="fab fa-youtube" style="color:#FF4444;font-size:20px;"></i>
+        </div>
+        <div style="flex:1;">
+          <h3 style="font-size:14px;font-weight:700;color:var(--text-primary);">ইউটিউব সাবস্ক্রাইব</h3>
+          <p style="font-size:12px;color:var(--text-muted);">একবার করুন, ৫০ টাকা পান</p>
+        </div>
+        <span class="badge" style="background:rgba(255,0,0,0.1);color:#FF4444;border-color:rgba(255,0,0,0.2);">৫০ ৳</span>
+      </div>
+      <button onclick="completeYoutubeTask()" id="youtubeBtn"
+        style="width:100%;padding:12px;background:rgba(255,0,0,0.08);border:1px solid rgba(255,0,0,0.2);color:#FF4444;border-radius:12px;font-weight:600;font-size:14px;cursor:pointer;transition:all 0.3s;">
+        🎥 ক্লেইম ৫০ টাকা
+      </button>
+    </div>
+
+  </div>
+
+  <div class="bottom-nav">
+    <a href="index.html" class="nav-item"><i class="fas fa-home"></i><span>হোম</span></a>
+    <a href="tasks.html" class="nav-item active"><i class="fas fa-tasks"></i><span>টাস্ক</span></a>
+    <a href="referral.html" class="nav-item"><i class="fas fa-users"></i><span>রেফারেল</span></a>
+    <a href="withdraw.html" class="nav-item"><i class="fas fa-wallet"></i><span>উত্তোলন</span></a>
+    <a href="profile.html" class="nav-item"><i class="fas fa-user"></i><span>প্রোফাইল</span></a>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-client.js"></script>
+  <script src="app.js"></script>
+  <script>
+    // Dynamic reward texts
+    document.getElementById('taskMainReward').textContent = (window.CONFIG.AD_REWARD || 10) + ' ৳ / এড';
+    document.getElementById('taskBonusReward').textContent = (window.CONFIG.BONUS_AD_REWARD || 5) + ' ৳ / এড';
+    document.getElementById('taskDailyReward').textContent = (window.CONFIG.DAILY_BONUS_REWARD || 3) + ' ৳ / এড';
+
+    function checkHourlyReset() {
+      const h = new Date().getHours(), last = localStorage.getItem('last_ad_reset_hour');
+      if (last !== null && parseInt(last) !== h) { localStorage.setItem('hourly_ads_watched','0'); localStorage.setItem('last_ad_reset_hour', h.toString()); }
+      if (last === null) { localStorage.setItem('last_ad_reset_hour', h.toString()); localStorage.setItem('hourly_ads_watched','0'); }
+    }
+    function checkHourlyBonusReset() {
+      const h = new Date().getHours(), last = localStorage.getItem('last_bonus_reset_hour');
+      if (last !== null && parseInt(last) !== h) { localStorage.setItem('hourly_bonus_ads_watched','0'); localStorage.setItem('last_bonus_reset_hour', h.toString()); }
+      if (last === null) { localStorage.setItem('last_bonus_reset_hour', h.toString()); localStorage.setItem('hourly_bonus_ads_watched','0'); }
+    }
+    function getHourlyAdsCount() { checkHourlyReset(); return parseInt(localStorage.getItem('hourly_ads_watched') || '0'); }
+    function getHourlyBonusCount() { checkHourlyBonusReset(); return parseInt(localStorage.getItem('hourly_bonus_ads_watched') || '0'); }
+    function getDailyBonusCount() {
+      const today = new Date().toDateString(), last = localStorage.getItem('last_daily_bonus_date');
+      if (last !== today) { localStorage.setItem('daily_bonus_ads','0'); localStorage.setItem('last_daily_bonus_date', today); }
+      return parseInt(localStorage.getItem('daily_bonus_ads') || '0');
+    }
+    function getTimeUntilNextHour() {
+      const now = new Date(), next = new Date(now);
+      next.setHours(now.getHours()+1,0,0,0);
+      const m = Math.floor((next-now)/60000);
+      return m > 60 ? `${Math.floor(m/60)}ঘ ${m%60}মি` : `${m} মিনিট`;
+    }
+    function updateUI() {
+      const a = getHourlyAdsCount(), b = getHourlyBonusCount(), d = getDailyBonusCount();
+      document.getElementById('todayAdsCount').textContent = a;
+      document.getElementById('bonusAdsCount').textContent = b;
+      document.getElementById('dailyBonusCount').textContent = d;
+      document.getElementById('progressFill').style.width = `${(a/10)*100}%`;
+      document.getElementById('bonusProgressFill').style.width = `${(b/10)*100}%`;
+      document.getElementById('dailyBonusProgress').style.width = `${(d/50)*100}%`;
+      document.getElementById('resetTimer').textContent = getTimeUntilNextHour();
+    }
+    async function completeTelegramTask() {
+      if (localStorage.getItem('task_telegram')) { alert('✅ আপনি আগেই এই টাস্ক সম্পন্ন করেছেন!'); return; }
+      window.open('https://t.me/mishti_kumra_official','_blank');
+      await addBonus(50);
+      localStorage.setItem('task_telegram','done');
+      const btn = document.getElementById('telegramBtn');
+      btn.innerHTML = '✅ সম্পন্ন! ৫০ টাকা পেয়েছেন';
+      btn.disabled = true;
+      btn.style.opacity = '0.7';
+      alert('🎉 ৫০ টাকা বোনাস যোগ হয়েছে!');
+    }
+    async function completeYoutubeTask() {
+      if (localStorage.getItem('task_youtube')) { alert('✅ আপনি আগেই এই টাস্ক সম্পন্ন করেছেন!'); return; }
+      window.open('https://youtube.com/@mishtikumra-y8v','_blank');
+      await addBonus(50);
+      localStorage.setItem('task_youtube','done');
+      const btn = document.getElementById('youtubeBtn');
+      btn.innerHTML = '✅ সম্পন্ন! ৫০ টাকা পেয়েছেন';
+      btn.disabled = true;
+      btn.style.opacity = '0.7';
+      alert('🎉 ৫০ টাকা বোনাস যোগ হয়েছে!');
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      updateUI();
+      setInterval(updateUI, 60000);
+      if (localStorage.getItem('task_telegram')) { const b = document.getElementById('telegramBtn'); b.innerHTML = '✅ সম্পন্ন'; b.disabled = true; b.style.opacity='0.7'; }
+      if (localStorage.getItem('task_youtube')) { const b = document.getElementById('youtubeBtn'); b.innerHTML = '✅ সম্পন্ন'; b.disabled = true; b.style.opacity='0.7'; }
+    });
+  </script>
+</body>
+</html>

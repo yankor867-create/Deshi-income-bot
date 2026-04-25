@@ -1,0 +1,33 @@
+[build]
+  publish = "."
+
+[[redirects]]
+  from = "/api/*"
+  to = "/404.html"
+  status = 404
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[headers]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "ALLOW-FROM https://web.telegram.org"
+    Content-Security-Policy = "frame-ancestors https://web.telegram.org https://telegram.org 'self'"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "no-referrer-when-downgrade"
+    Access-Control-Allow-Origin = "*"
+
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
+
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"

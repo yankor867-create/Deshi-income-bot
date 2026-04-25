@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>প্রোফাইল | দেশী ইনকাম</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="min-h-screen pb-24">
+
+  <div class="container mx-auto px-4 py-5">
+
+    <!-- Profile Hero -->
+    <div class="glass-card p-6 text-center mb-5 fade-up fade-up-1" style="border-color:rgba(245,200,66,0.15);">
+      <div class="avatar-ring float" style="display:inline-block;margin-bottom:14px;">
+        <div class="avatar-inner" style="width:80px;height:80px;">
+          <span id="avatarText" style="color:var(--gold);font-size:30px;font-weight:800;font-family:'Sora',sans-serif;">U</span>
+        </div>
+      </div>
+      <h2 style="font-size:20px;font-weight:700;color:var(--text-primary);" id="profileName">ইউজার</h2>
+      <p style="font-size:12px;color:var(--text-muted);margin-top:3px;" id="userId">আইডি লোড হচ্ছে...</p>
+      <p style="font-size:11px;color:var(--text-dim);margin-top:2px;" id="joinDate">জয়েন তারিখ: --</p>
+      <div class="badge badge-gold mx-auto mt-3">সক্রিয় সদস্য</div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-2 gap-3 mb-5 fade-up fade-up-2">
+      <div class="stat-card" style="border-color:rgba(0,212,168,0.15);">
+        <div style="width:34px;height:34px;background:rgba(0,212,168,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:8px;">
+          <i class="fas fa-eye" style="color:var(--emerald);font-size:14px;"></i>
+        </div>
+        <p style="font-size:10px;color:var(--text-muted);">মোট এড</p>
+        <p style="font-size:22px;font-weight:800;color:var(--text-primary);font-family:'Sora',sans-serif;" id="totalAds">0</p>
+      </div>
+      <div class="stat-card" style="border-color:rgba(245,200,66,0.15);">
+        <div style="width:34px;height:34px;background:rgba(245,200,66,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:8px;">
+          <i class="fas fa-chart-line" style="color:var(--gold);font-size:14px;"></i>
+        </div>
+        <p style="font-size:10px;color:var(--text-muted);">মোট আয়</p>
+        <p style="font-size:22px;font-weight:800;font-family:'Sora',sans-serif;" class="text-gold" id="totalIncome">0</p>
+      </div>
+      <div class="stat-card" style="border-color:rgba(139,92,246,0.15);">
+        <div style="width:34px;height:34px;background:rgba(139,92,246,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:8px;">
+          <i class="fas fa-users" style="color:var(--violet);font-size:14px;"></i>
+        </div>
+        <p style="font-size:10px;color:var(--text-muted);">রেফারেল</p>
+        <p style="font-size:22px;font-weight:800;color:var(--violet);font-family:'Sora',sans-serif;" id="profileReferrals">0</p>
+      </div>
+      <div class="stat-card" style="border-color:rgba(255,92,138,0.15);">
+        <div style="width:34px;height:34px;background:rgba(255,92,138,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:8px;">
+          <i class="fas fa-wallet" style="color:var(--rose);font-size:14px;"></i>
+        </div>
+        <p style="font-size:10px;color:var(--text-muted);">ব্যালেন্স</p>
+        <p style="font-size:22px;font-weight:800;color:var(--rose);font-family:'Sora',sans-serif;" id="profileBalance">0</p>
+      </div>
+    </div>
+
+    <!-- Notification Card -->
+    <div class="glass-card p-5 mb-4 fade-up fade-up-3">
+      <h3 style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+        <i class="fas fa-bell" style="color:var(--gold);"></i> নোটিফিকেশন
+      </h3>
+      <button onclick="showNotificationSubscribePrompt()"
+        style="width:100%;padding:13px;background:rgba(29,161,242,0.08);border:1px solid rgba(29,161,242,0.2);color:#1DA1F2;border-radius:12px;font-weight:600;font-size:14px;cursor:pointer;transition:all 0.3s;">
+        <i class="fab fa-telegram mr-2"></i> টেলিগ্রাম নোটিফিকেশন চালু করুন
+      </button>
+      <p style="font-size:11px;color:var(--text-dim);text-align:center;margin-top:8px;">নতুন এড ও বোনাসের আপডেট পেতে সাবস্ক্রাইব করুন</p>
+    </div>
+
+    <!-- Settings Card -->
+    <div class="glass-card p-5 fade-up fade-up-4">
+      <h3 style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+        <i class="fas fa-cog" style="color:var(--emerald);"></i> সেটিংস
+      </h3>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <button onclick="copyReferralLink()"
+          style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:12px;color:var(--text-primary);font-size:13px;cursor:pointer;transition:all 0.3s;width:100%;">
+          <span style="display:flex;align-items:center;gap:8px;"><i class="fas fa-link" style="color:var(--emerald);"></i>রেফারেল লিঙ্ক কপি</span>
+          <i class="fas fa-copy" style="color:var(--text-dim);"></i>
+        </button>
+        <button onclick="logout()"
+          style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:rgba(255,92,138,0.05);border:1px solid rgba(255,92,138,0.15);border-radius:12px;color:var(--rose);font-size:13px;cursor:pointer;transition:all 0.3s;width:100%;">
+          <span style="display:flex;align-items:center;gap:8px;"><i class="fas fa-sign-out-alt"></i>লগ আউট</span>
+          <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <a href="index.html" class="nav-item"><i class="fas fa-home"></i><span>হোম</span></a>
+    <a href="tasks.html" class="nav-item"><i class="fas fa-tasks"></i><span>টাস্ক</span></a>
+    <a href="referral.html" class="nav-item"><i class="fas fa-users"></i><span>রেফারেল</span></a>
+    <a href="withdraw.html" class="nav-item"><i class="fas fa-wallet"></i><span>উত্তোলন</span></a>
+    <a href="profile.html" class="nav-item active"><i class="fas fa-user"></i><span>প্রোফাইল</span></a>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-client.js"></script>
+  <script src="app.js"></script>
+  <script>
+    function showNotificationSubscribePrompt() {
+      window.open(`https://t.me/${window.CONFIG?.BOT_USERNAME || 'mishti_kumra_bot'}`, '_blank');
+    }
+    async function copyReferralLink() {
+      const user = await getCurrentUser();
+      const link = `https://t.me/${window.CONFIG?.BOT_USERNAME || 'mishti_kumra_bot'}?startapp=ref${user.id}`;
+      await navigator.clipboard.writeText(link);
+      alert('✅ লিঙ্ক কপি হয়েছে!');
+    }
+    function logout() {
+      if (confirm('লগ আউট করতে চান?')) { localStorage.clear(); window.location.href = 'index.html'; }
+    }
+    function updateProfileUI() {
+      const user = getUserData();
+      if (user) {
+        document.getElementById('profileName').textContent = user.first_name || 'ইউজার';
+        document.getElementById('avatarText').textContent = (user.first_name || 'U').charAt(0).toUpperCase();
+        document.getElementById('userId').textContent = `আইডি: ${user.id}`;
+        document.getElementById('joinDate').textContent = `জয়েন: ${new Date(user.join_date).toLocaleDateString('bn')}`;
+        document.getElementById('totalAds').textContent = user.total_ads || 0;
+        document.getElementById('totalIncome').textContent = (user.total_income || 0).toFixed(2);
+        document.getElementById('profileReferrals').textContent = user.total_referrals || 0;
+        document.getElementById('profileBalance').textContent = (user.balance || 0).toFixed(2);
+      }
+    }
+    document.addEventListener('DOMContentLoaded', () => { setTimeout(updateProfileUI, 1000); setInterval(updateProfileUI, 30000); });
+  </script>
+</body>
+</html>

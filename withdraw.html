@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>উত্তোলন | দেশী ইনকাম</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="min-h-screen pb-24">
+
+  <div class="container mx-auto px-4 py-5">
+
+    <div class="balance-card p-6 mb-5 text-center fade-up fade-up-1">
+      <p style="font-size:12px;color:rgba(245,200,66,0.6);font-weight:500;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">উপলব্ধ ব্যালেন্স</p>
+      <h2 style="font-size:40px;font-weight:800;font-family:'Sora',sans-serif;position:relative;z-index:1;" class="text-gold" id="balance">০.০০ ৳</h2>
+    </div>
+
+    <div class="glass-card p-5 mb-5 fade-up fade-up-2">
+      <h3 style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+        <i class="fas fa-clipboard-check" style="color:var(--emerald);"></i> উত্তোলনের শর্ত
+      </h3>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:rgba(255,255,255,0.03);border-radius:10px;border:1px solid var(--border);">
+          <span style="font-size:13px;color:var(--text-muted);">💰 ন্যূনতম পরিমাণ</span>
+          <span class="badge badge-emerald">৫০০ ৳</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:rgba(255,255,255,0.03);border-radius:10px;border:1px solid var(--border);">
+          <span style="font-size:13px;color:var(--text-muted);">👥 রেফারেল প্রয়োজন</span>
+          <span class="badge" id="reqReferrals" style="background:rgba(255,100,100,0.1);color:#FF6464;border-color:rgba(255,100,100,0.25);">0/15</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:rgba(255,255,255,0.03);border-radius:10px;border:1px solid var(--border);">
+          <span style="font-size:13px;color:var(--text-muted);">📺 মোট এড প্রয়োজন</span>
+          <span class="badge" id="reqAds" style="background:rgba(255,100,100,0.1);color:#FF6464;border-color:rgba(255,100,100,0.25);">0/50</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="glass-card p-5 fade-up fade-up-3">
+      <h3 style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+        <i class="fas fa-paper-plane" style="color:var(--gold);"></i> উত্তোলন ফর্ম
+      </h3>
+
+      <div class="grid grid-cols-2 gap-3 mb-4">
+        <div onclick="selectMethod('bkash')" id="method-bkash" class="method-card">
+          <div style="width:44px;height:44px;background:linear-gradient(135deg,#E91E8C,#FF4EC7);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;">
+            <span style="color:#fff;font-weight:800;font-size:16px;">b</span>
+          </div>
+          <p style="font-size:13px;font-weight:700;color:var(--text-primary);">bKash</p>
+        </div>
+        <div onclick="selectMethod('nagad')" id="method-nagad" class="method-card">
+          <div style="width:44px;height:44px;background:linear-gradient(135deg,#FF6B00,#FF9B50);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;">
+            <i class="fas fa-mobile-alt" style="color:#fff;font-size:20px;"></i>
+          </div>
+          <p style="font-size:13px;font-weight:700;color:var(--text-primary);">Nagad</p>
+        </div>
+        <div onclick="selectMethod('rocket')" id="method-rocket" class="method-card">
+          <div style="width:44px;height:44px;background:linear-gradient(135deg,#8B00CC,#BB44FF);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;">
+            <i class="fas fa-rocket" style="color:#fff;font-size:18px;"></i>
+          </div>
+          <p style="font-size:13px;font-weight:700;color:var(--text-primary);">Rocket</p>
+        </div>
+        <div onclick="selectMethod('usdt')" id="method-usdt" class="method-card">
+          <div style="width:44px;height:44px;background:linear-gradient(135deg,#26A17B,#2ECC9E);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;">
+            <i class="fab fa-bitcoin" style="color:#fff;font-size:20px;"></i>
+          </div>
+          <p style="font-size:13px;font-weight:700;color:var(--text-primary);">USDT</p>
+        </div>
+      </div>
+
+      <div id="bkash-fields" class="method-fields" style="display:none;">
+        <input type="tel" id="bkash_account" placeholder="bKash নম্বর (01XXXXXXXXX)" style="margin-bottom:12px;">
+      </div>
+      <div id="nagad-fields" class="method-fields" style="display:none;">
+        <input type="tel" id="nagad_account" placeholder="Nagad নম্বর (01XXXXXXXXX)" style="margin-bottom:12px;">
+      </div>
+      <div id="rocket-fields" class="method-fields" style="display:none;">
+        <input type="tel" id="rocket_account" placeholder="Rocket নম্বর (01XXXXXXXXX)" style="margin-bottom:12px;">
+      </div>
+      <div id="usdt-fields" class="method-fields" style="display:none;">
+        <input type="text" id="usdt_address" placeholder="USDT (TRC20) ওয়ালেট ঠিকানা" style="margin-bottom:12px;">
+      </div>
+
+      <input type="number" id="amount" placeholder="পরিমাণ লিখুন (টাকা)" style="margin-bottom:16px;">
+
+      <button onclick="submitWithdraw()" id="withdrawBtn" class="btn-primary w-full" style="font-size:15px;padding:16px;border-radius:16px;">
+        💸 উত্তোলন করুন
+      </button>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <a href="index.html" class="nav-item"><i class="fas fa-home"></i><span>হোম</span></a>
+    <a href="tasks.html" class="nav-item"><i class="fas fa-tasks"></i><span>টাস্ক</span></a>
+    <a href="referral.html" class="nav-item"><i class="fas fa-users"></i><span>রেফারেল</span></a>
+    <a href="withdraw.html" class="nav-item active"><i class="fas fa-wallet"></i><span>উত্তোলন</span></a>
+    <a href="profile.html" class="nav-item"><i class="fas fa-user"></i><span>প্রোফাইল</span></a>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-client.js"></script>
+  <script src="app.js"></script>
+  <script>
+    let selectedMethod = null;
+
+    function selectMethod(method) {
+      selectedMethod = method;
+      document.querySelectorAll('.method-card').forEach(c => c.classList.remove('selected'));
+      document.getElementById(`method-${method}`).classList.add('selected');
+      document.querySelectorAll('.method-fields').forEach(f => f.style.display = 'none');
+      document.getElementById(`${method}-fields`).style.display = 'block';
+    }
+
+    async function submitWithdraw() {
+      // BUG FIX: Now calls requestWithdraw() from app.js which deducts balance & saves to DB
+      const user = getCurrentUser();
+      if (!user) { alert('ডেটা লোড হয়নি!'); return; }
+      if (!selectedMethod) { alert('পেমেন্ট মেথড সিলেক্ট করুন!'); return; }
+
+      const amount = parseFloat(document.getElementById('amount').value);
+      let account = '';
+      if (selectedMethod === 'bkash') account = document.getElementById('bkash_account').value.trim();
+      else if (selectedMethod === 'nagad') account = document.getElementById('nagad_account').value.trim();
+      else if (selectedMethod === 'rocket') account = document.getElementById('rocket_account').value.trim();
+      else if (selectedMethod === 'usdt') account = document.getElementById('usdt_address').value.trim();
+
+      if (!account) { alert('একাউন্ট নম্বর/ঠিকানা দিন!'); return; }
+      if (isNaN(amount) || amount <= 0) { alert('সঠিক পরিমাণ দিন!'); return; }
+
+      if (!confirm(`${amount} টাকা উত্তোলন করবেন?\nমেথড: ${selectedMethod.toUpperCase()}\nএকাউন্ট: ${account}`)) return;
+
+      const btn = document.getElementById('withdrawBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> প্রসেস হচ্ছে...';
+
+      const result = await window.requestWithdraw(amount, account, selectedMethod);
+
+      if (result && result.success) {
+        alert('✅ উত্তোলন রিকোয়েস্ট সফল! ২৪-৪৮ ঘন্টার মধ্যে পেমেন্ট করা হবে।');
+        updateRequirements();
+      } else {
+        alert('❌ ' + (result?.error || 'উত্তোলন ব্যর্থ হয়েছে।'));
+      }
+
+      btn.disabled = false;
+      btn.innerHTML = '💸 উত্তোলন করুন';
+    }
+
+    function updateRequirements() {
+      const user = getUserData();
+      if (user) {
+        document.getElementById('balance').textContent = (user.balance || 0).toFixed(2) + ' ৳';
+        const refs = user.total_referrals || 0, ads = user.total_ads || 0;
+        const refEl = document.getElementById('reqReferrals');
+        const adsEl = document.getElementById('reqAds');
+        refEl.textContent = `${refs}/15`;
+        adsEl.textContent = `${ads}/50`;
+        if (refs >= 15) refEl.className = 'badge badge-emerald';
+        if (ads >= 50) adsEl.className = 'badge badge-emerald';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => { setTimeout(updateRequirements, 1000); setInterval(updateRequirements, 30000); });
+  </script>
+</body>
+</html>

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>রেফারেল | দেশী ইনকাম</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="min-h-screen pb-24">
+
+  <div class="container mx-auto px-4 py-5">
+
+    <div class="text-center mb-6 fade-up fade-up-1">
+      <div style="width:72px;height:72px;background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.25);border-radius:22px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;" class="float">
+        <i class="fas fa-users" style="color:var(--violet);font-size:30px;"></i>
+      </div>
+      <h1 style="font-size:22px;font-weight:700;color:var(--text-primary);">রেফারেল প্রোগ্রাম</h1>
+      <p style="font-size:13px;color:var(--text-muted);margin-top:4px;">প্রতি বন্ধু আনলে <span style="color:var(--violet);font-weight:700;">১০০ টাকা</span> বোনাস</p>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3 mb-5 fade-up fade-up-2">
+      <div class="stat-card" style="border-color:rgba(139,92,246,0.2);">
+        <div style="width:36px;height:36px;background:rgba(139,92,246,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:8px;">
+          <i class="fas fa-user-friends" style="color:var(--violet);font-size:16px;"></i>
+        </div>
+        <p style="font-size:11px;color:var(--text-muted);">মোট রেফারেল</p>
+        <p style="font-size:30px;font-weight:800;color:var(--violet);font-family:'Sora',sans-serif;" id="totalReferrals">0</p>
+      </div>
+      <div class="stat-card" style="border-color:rgba(245,200,66,0.15);">
+        <div style="width:36px;height:36px;background:rgba(245,200,66,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:8px;">
+          <i class="fas fa-coins" style="color:var(--gold);font-size:16px;"></i>
+        </div>
+        <p style="font-size:11px;color:var(--text-muted);">রেফারেল বোনাস</p>
+        <p style="font-size:30px;font-weight:800;font-family:'Sora',sans-serif;" class="text-gold" id="referralBonus">0</p>
+        <p style="font-size:11px;color:var(--text-dim);">টাকা</p>
+      </div>
+    </div>
+
+    <div class="glass-card p-5 mb-4 fade-up fade-up-3">
+      <h3 style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+        <i class="fas fa-link" style="color:var(--violet);"></i> আপনার রেফারেল লিঙ্ক
+      </h3>
+      <div style="background:rgba(139,92,246,0.06);border:1px solid rgba(139,92,246,0.15);border-radius:12px;padding:12px 14px;margin-bottom:12px;word-break:break-all;">
+        <code style="color:var(--violet);font-size:12px;line-height:1.6;" id="referralLink">লোড হচ্ছে...</code>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button id="copyLinkBtn" class="btn-violet" style="flex:1;font-size:14px;padding:13px;">
+          📋 লিঙ্ক কপি করুন
+        </button>
+        <button id="shareLinkBtn" class="btn-emerald" style="flex:1;font-size:14px;padding:13px;">
+          📤 শেয়ার করুন
+        </button>
+      </div>
+    </div>
+
+    <button id="refreshBtn" class="btn-emerald w-full mb-4" style="font-size:14px;padding:13px;">
+      🔄 রেফারেল কাউন্ট রিফ্রেশ করুন
+    </button>
+
+    <div class="glass-card p-5 fade-up fade-up-4">
+      <h3 style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+        <i class="fas fa-list" style="color:var(--gold);"></i> আপনার রেফারেল লিস্ট
+      </h3>
+      <div id="referralsList" style="max-height:300px;overflow-y:auto;">
+        <p class="text-center" style="color:var(--text-dim);padding:20px;">লোড হচ্ছে...</p>
+      </div>
+    </div>
+
+    <div class="glass-card p-5 mt-4 fade-up fade-up-4">
+      <h3 style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+        <i class="fas fa-scroll" style="color:var(--gold);"></i> রেফারেল নিয়ম
+      </h3>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;gap:10px;align-items:flex-start;padding:10px;background:rgba(139,92,246,0.05);border-radius:10px;">
+          <div style="width:28px;height:28px;background:rgba(139,92,246,0.12);border-radius:8px;display:flex;align-items:center;justify-content:center;">
+            <i class="fas fa-gift" style="color:var(--violet);font-size:12px;"></i>
+          </div>
+          <p style="font-size:13px;color:var(--text-muted);">প্রতি রেফারেলে আপনি পাবেন <strong style="color:var(--violet);">১০০ টাকা</strong></p>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;padding:10px;background:rgba(0,212,168,0.05);border-radius:10px;">
+          <div style="width:28px;height:28px;background:rgba(0,212,168,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;">
+            <i class="fas fa-user-plus" style="color:var(--emerald);font-size:12px;"></i>
+          </div>
+          <p style="font-size:13px;color:var(--text-muted);">আপনার রেফারেল পাবে <strong style="color:var(--emerald);">৫০ টাকা</strong> বোনাস</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <a href="index.html" class="nav-item"><i class="fas fa-home"></i><span>হোম</span></a>
+    <a href="tasks.html" class="nav-item"><i class="fas fa-tasks"></i><span>টাস্ক</span></a>
+    <a href="referral.html" class="nav-item active"><i class="fas fa-users"></i><span>রেফারেল</span></a>
+    <a href="withdraw.html" class="nav-item"><i class="fas fa-wallet"></i><span>উত্তোলন</span></a>
+    <a href="profile.html" class="nav-item"><i class="fas fa-user"></i><span>প্রোফাইল</span></a>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-client.js"></script>
+  <script src="app.js"></script>
+  <script>
+    const tg = window.Telegram?.WebApp;
+    let currentReferralLink = '';
+
+    if (tg) {
+      tg.ready();
+      tg.expand();
+    }
+
+    async function updateReferralUI() {
+      const user = window.getCurrentUser ? window.getCurrentUser() : null;
+      
+      if (!user || !user.id) {
+        document.getElementById('referralLink').textContent = 'ইউজার লোড হচ্ছে...';
+        return;
+      }
+
+      // Update counts from current user data
+      const count = Number(user.total_referrals) || 0;
+      document.getElementById('totalReferrals').textContent = count;
+      document.getElementById('referralBonus').textContent = (count * 100).toFixed(0);
+
+      // Set the referral link
+      const botUsername = window.CONFIG?.BOT_USERNAME || 'deshiincomebot';
+      currentReferralLink = `https://t.me/${botUsername}?startapp=ref${user.id}`;
+      document.getElementById('referralLink').textContent = currentReferralLink;
+
+      // Load referrals list
+      try {
+        const referrals = await window.loadMyReferrals();
+        const listContainer = document.getElementById('referralsList');
+        if (referrals && referrals.length > 0) {
+          listContainer.innerHTML = referrals.map(ref => `
+            <div class="flex items-center justify-between p-3 border-b" style="border-color:rgba(255,255,255,0.05);">
+              <div>
+                <p class="text-sm font-semibold" style="color:var(--text-primary);">${ref.new_user_name || 'ইউজার'}</p>
+                <p class="text-xs" style="color:var(--text-dim);">${new Date(ref.join_date).toLocaleDateString('bn')}</p>
+              </div>
+              <span class="badge badge-gold">+১০০ টাকা</span>
+            </div>
+          `).join('');
+        } else {
+          listContainer.innerHTML = '<p class="text-center" style="color:var(--text-dim);padding:20px;">কোনো রেফারেল নেই</p>';
+        }
+      } catch (e) {
+        console.error('Failed to load referrals:', e);
+        document.getElementById('referralsList').innerHTML = '<p class="text-center" style="color:var(--text-dim);padding:20px;">লোড করতে সমস্যা হয়েছে</p>';
+      }
+    }
+
+    function copyReferralLink() {
+      if (!currentReferralLink || currentReferralLink.includes('লোড')) {
+        const msg = 'লিঙ্ক এখনো লোড হয়নি। একটু অপেক্ষা করুন।';
+        if (tg) tg.showAlert(msg);
+        else alert(msg);
+        return;
+      }
+
+      navigator.clipboard.writeText(currentReferralLink).then(() => {
+        const msg = '✅ রেফারেল লিঙ্ক কপি হয়েছে!';
+        if (tg) tg.showAlert(msg);
+        else alert(msg);
+      }).catch(() => {
+        const textarea = document.createElement('textarea');
+        textarea.value = currentReferralLink;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        const msg = '✅ রেফারেল লিঙ্ক কপি হয়েছে!';
+        if (tg) tg.showAlert(msg);
+        else alert(msg);
+      });
+    }
+
+    function shareReferralLink() {
+      if (!currentReferralLink || currentReferralLink.includes('লোড')) {
+        const msg = 'লিঙ্ক এখনো লোড হয়নি। একটু অপেক্ষা করুন।';
+        if (tg) tg.showAlert(msg);
+        else alert(msg);
+        return;
+      }
+
+      const shareText = `🇧🇩 দেশী ইনকামে জয়েন করুন!\n\n💰 সাইন আপ বোনাস: ৫০ টাকা\n🎬 প্রতি এড: ৩০ টাকা\n👥 রেফারেল বোনাস: ১০০ টাকা\n\n👇 লিঙ্ক:\n${currentReferralLink}`;
+
+      if (tg && typeof tg.openTelegramLink === 'function') {
+        const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(currentReferralLink)}&text=${encodeURIComponent('দেশী ইনকামে জয়েন করে টাকা আয় করুন!')}`;
+        tg.openTelegramLink(shareUrl);
+      } else if (navigator.share) {
+        navigator.share({
+          title: 'দেশী ইনকাম',
+          text: 'দেশী ইনকামে জয়েন করে টাকা আয় করুন!',
+          url: currentReferralLink
+        }).catch(() => copyReferralLink());
+      } else {
+        copyReferralLink();
+      }
+    }
+
+    async function refreshReferralCount() {
+      const btn = document.getElementById('refreshBtn');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> রিফ্রেশ হচ্ছে...';
+      btn.disabled = true;
+      
+      try {
+        if (window.refreshMyReferralCount) {
+          await window.refreshMyReferralCount();  // This updates currentUser and UI
+        } else {
+          await window.loadUser();
+        }
+        await updateReferralUI();
+        const user = window.getCurrentUser();
+        const newCount = user?.total_referrals || 0;
+        const msg = `✅ রেফারেল কাউন্ট আপডেট হয়েছে: ${newCount} জন`;
+        if (tg) tg.showAlert(msg);
+        else alert(msg);
+      } catch (error) {
+        const msg = '❌ রিফ্রেশ করতে সমস্যা হয়েছে।';
+        if (tg) tg.showAlert(msg);
+        else alert(msg);
+      }
+      
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+    }
+
+    // Wait for user data and then update UI (only once)
+    let attempts = 0;
+    function waitForUser() {
+      const user = window.getCurrentUser ? window.getCurrentUser() : null;
+      if (user && user.id) {
+        updateReferralUI();
+      } else if (attempts < 30) {
+        attempts++;
+        setTimeout(waitForUser, 200);
+      } else {
+        document.getElementById('referralLink').textContent = 'ডেটা লোড হয়নি – রিফ্রেশ করুন';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('copyLinkBtn').addEventListener('click', copyReferralLink);
+      document.getElementById('shareLinkBtn').addEventListener('click', shareReferralLink);
+      document.getElementById('refreshBtn').addEventListener('click', refreshReferralCount);
+      
+      waitForUser();   // initial load
+      // NO setInterval – no more auto-refresh!
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+# SPA routing
+/*    /index.html    200
+
+# Block API calls
+/api/*    /404.html   404

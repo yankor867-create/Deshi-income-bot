@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>দেশী ইনকাম | বাংলায় আয় করুন</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="min-h-screen pb-24">
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="text-center">
+      <div style="font-size:48px;margin-bottom:16px;">🇧🇩</div>
+      <div class="loader-ring mx-auto mb-6"></div>
+      <p style="color:var(--text-primary);font-size:18px;font-weight:600;">দেশী ইনকাম</p>
+      <p style="color:var(--text-muted);font-size:13px;margin-top:6px;">লোড হচ্ছে...</p>
+    </div>
+  </div>
+
+  <div class="container mx-auto px-4 py-5">
+
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-5 fade-up fade-up-1">
+      <div>
+        <p style="color:var(--text-muted);font-size:13px;">স্বাগতম 👋</p>
+        <h2 style="font-size:22px;font-weight:700;color:var(--text-primary);margin-top:2px;" id="userName">ইউজার</h2>
+        <p style="font-size:11px;color:var(--text-dim);margin-top:2px;" id="userId">আইডি লোড হচ্ছে...</p>
+      </div>
+      <div class="float">
+        <div style="width:52px;height:52px;background:linear-gradient(135deg,var(--gold-dark),var(--gold));border-radius:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(245,200,66,0.3);">
+          <i class="fas fa-coins" style="color:#0A0800;font-size:22px;"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Balance Card -->
+    <div class="balance-card p-6 mb-5 fade-up fade-up-2">
+      <div class="flex justify-between items-start" style="position:relative;z-index:1;">
+        <div>
+          <p style="color:rgba(245,200,66,0.6);font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;">মোট ব্যালেন্স</p>
+          <div class="flex items-end gap-2 mt-1">
+            <h1 style="font-size:42px;font-weight:800;font-family:'Sora',sans-serif;" class="text-gold" id="mainBalance">০.০০</h1>
+            <span style="color:rgba(245,200,66,0.5);font-size:16px;margin-bottom:8px;">৳</span>
+          </div>
+        </div>
+        <div class="pulse-gold" style="width:52px;height:52px;background:rgba(245,200,66,0.08);border:1px solid rgba(245,200,66,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+          <i class="fas fa-bangladeshi-taka-sign" style="color:var(--gold);font-size:22px;"></i>
+        </div>
+      </div>
+      <div class="divider" style="background:linear-gradient(90deg,transparent,rgba(245,200,66,0.15),transparent);"></div>
+      <div class="flex justify-between" style="position:relative;z-index:1;">
+        <div>
+          <p style="font-size:11px;color:rgba(245,200,66,0.5);">মোট এড</p>
+          <p style="font-size:18px;font-weight:700;color:var(--text-primary);" id="totalAds">0</p>
+        </div>
+        <div style="width:1px;background:rgba(245,200,66,0.1);"></div>
+        <div style="text-align:center;">
+          <p style="font-size:11px;color:rgba(245,200,66,0.5);">মোট আয়</p>
+          <p style="font-size:18px;font-weight:700;color:var(--text-primary);" id="totalIncome">০</p>
+        </div>
+        <div style="width:1px;background:rgba(245,200,66,0.1);"></div>
+        <div style="text-align:right;">
+          <p style="font-size:11px;color:rgba(245,200,66,0.5);">রেফারেল</p>
+          <p style="font-size:18px;font-weight:700;color:var(--text-primary);" id="totalReferrals">0</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="grid grid-cols-2 gap-3 mb-5 fade-up fade-up-3">
+      <div class="stat-card">
+        <div style="width:36px;height:36px;background:rgba(0,212,168,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;">
+          <i class="fas fa-clock" style="color:var(--emerald);font-size:16px;"></i>
+        </div>
+        <p style="font-size:11px;color:var(--text-muted);">এই ঘন্টায়</p>
+        <p style="font-size:20px;font-weight:700;color:var(--text-primary);" id="todayAds">0/10</p>
+        <p style="font-size:10px;color:var(--text-dim);margin-top:2px;" id="resetTimer">--</p>
+      </div>
+      <div class="stat-card" style="border-color:rgba(245,200,66,0.15);">
+        <div style="width:36px;height:36px;background:rgba(245,200,66,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;">
+          <i class="fas fa-fire" style="color:var(--gold);font-size:16px;"></i>
+        </div>
+        <p style="font-size:11px;color:var(--text-muted);">আজকের লক্ষ্য</p>
+        <p style="font-size:20px;font-weight:700;" class="text-gold">৩০০ ৳</p>
+        <p style="font-size:10px;color:var(--text-dim);margin-top:2px;">দৈনিক সর্বোচ্চ</p>
+      </div>
+    </div>
+
+    <!-- Action Grid -->
+    <p style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px;" class="fade-up fade-up-3">দ্রুত অ্যাকশন</p>
+    <div class="grid grid-cols-2 gap-3 mb-5 fade-up fade-up-4">
+      <a href="tasks.html" style="text-decoration:none;" class="task-card emerald-glow p-4 block">
+        <div style="width:40px;height:40px;background:rgba(0,212,168,0.12);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;">
+          <i class="fas fa-play-circle" style="color:var(--emerald);font-size:18px;"></i>
+        </div>
+        <p style="font-size:14px;font-weight:600;color:var(--text-primary);">এড দেখুন</p>
+        <p style="font-size:12px;color:var(--emerald);margin-top:2px;"><span id="adRewardHome">10</span> ৳ / এড</p>
+      </a>
+      <a href="daily-bonus.html" style="text-decoration:none;" class="task-card gold-glow p-4 block">
+        <div style="width:40px;height:40px;background:rgba(245,200,66,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;">
+          <i class="fas fa-calendar-day" style="color:var(--gold);font-size:18px;"></i>
+        </div>
+        <p style="font-size:14px;font-weight:600;color:var(--text-primary);">দৈনিক বোনাস</p>
+        <p style="font-size:12px;color:var(--gold);margin-top:2px;"><span id="dailyRewardHome">3</span> ৳ / এড</p>
+      </a>
+      <a href="referral.html" style="text-decoration:none;" class="task-card violet-glow p-4 block">
+        <div style="width:40px;height:40px;background:rgba(139,92,246,0.12);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;">
+          <i class="fas fa-users" style="color:var(--violet);font-size:18px;"></i>
+        </div>
+        <p style="font-size:14px;font-weight:600;color:var(--text-primary);">রেফারেল</p>
+        <p style="font-size:12px;color:var(--violet);margin-top:2px;">১০০ ৳ / জন</p>
+      </a>
+      <a href="withdraw.html" style="text-decoration:none;" class="task-card p-4 block" style="border-color:rgba(255,92,138,0.2);">
+        <div style="width:40px;height:40px;background:rgba(255,92,138,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;">
+          <i class="fas fa-wallet" style="color:var(--rose);font-size:18px;"></i>
+        </div>
+        <p style="font-size:14px;font-weight:600;color:var(--text-primary);">উত্তোলন</p>
+        <p style="font-size:12px;color:var(--rose);margin-top:2px;">৫০০ ৳ মিনিমাম</p>
+      </a>
+    </div>
+
+    <!-- Announcement Banner -->
+    <div class="glass-card-dark p-4 mb-5 fade-up fade-up-4" style="border-color:rgba(0,212,168,0.15);">
+      <div class="flex items-center gap-3">
+        <div style="width:40px;height:40px;background:rgba(0,212,168,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <i class="fas fa-bullhorn" style="color:var(--emerald);font-size:16px;"></i>
+        </div>
+        <div style="flex:1;">
+          <p style="font-size:13px;font-weight:600;color:var(--text-primary);">📢 পেমেন্ট প্রুফ চ্যানেল</p>
+          <p style="font-size:11px;color:var(--text-muted);">সকল পেমেন্ট এখানে দেখুন</p>
+        </div>
+        <a href="https://t.me/mishti_kumra_official" target="_blank"
+           style="background:rgba(0,212,168,0.12);border:1px solid rgba(0,212,168,0.25);color:var(--emerald);padding:8px 14px;border-radius:10px;font-size:12px;font-weight:600;text-decoration:none;white-space:nowrap;">
+          জয়েন করুন →
+        </a>
+      </div>
+    </div>
+
+    <!-- How to Earn -->
+    <div class="glass-card p-5 fade-up fade-up-4">
+      <h3 style="font-size:16px;font-weight:700;color:var(--text-primary);margin-bottom:16px;display:flex;align-items:center;gap:8px;">
+        <i class="fas fa-lightbulb" style="color:var(--gold);"></i> কীভাবে আয় করবেন?
+      </h3>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="check-item">
+          <div class="step-num" style="background:rgba(0,212,168,0.12);color:var(--emerald);">১</div>
+          <p style="font-size:13px;color:var(--text-muted);padding-top:6px;">এড দেখুন — প্রতি এডে <span style="color:var(--emerald);font-weight:700;" id="stepAdReward">10</span> টাকা</p>
+        </div>
+        <div class="check-item">
+          <div class="step-num" style="background:rgba(245,200,66,0.1);color:var(--gold);">২</div>
+          <p style="font-size:13px;color:var(--text-muted);padding-top:6px;">বোনাস এড — প্রতি এডে <span style="color:var(--gold);font-weight:700;" id="stepBonusReward">5</span> টাকা</p>
+        </div>
+        <div class="check-item">
+          <div class="step-num" style="background:rgba(139,92,246,0.12);color:var(--violet);">৩</div>
+          <p style="font-size:13px;color:var(--text-muted);padding-top:6px;">বন্ধু আনুন — প্রতি রেফারেলে <span style="color:var(--violet);font-weight:700;">১০০ টাকা</span></p>
+        </div>
+        <div class="check-item">
+          <div class="step-num" style="background:rgba(255,92,138,0.1);color:var(--rose);">৪</div>
+          <p style="font-size:13px;color:var(--text-muted);padding-top:6px;">দৈনিক বোনাস — প্রতিদিন সর্বোচ্চ <span style="color:var(--rose);font-weight:700;">২৫০ টাকা</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation -->
+  <div class="bottom-nav">
+    <a href="index.html" class="nav-item active"><i class="fas fa-home"></i><span>হোম</span></a>
+    <a href="tasks.html" class="nav-item"><i class="fas fa-tasks"></i><span>টাস্ক</span></a>
+    <a href="referral.html" class="nav-item"><i class="fas fa-users"></i><span>রেফারেল</span></a>
+    <a href="withdraw.html" class="nav-item"><i class="fas fa-wallet"></i><span>উত্তোলন</span></a>
+    <a href="profile.html" class="nav-item"><i class="fas fa-user"></i><span>প্রোফাইল</span></a>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-client.js"></script>
+  <script src="app.js"></script>
+  <script>
+    // Set dynamic reward values
+    document.getElementById('adRewardHome').textContent = window.CONFIG.AD_REWARD || 10;
+    document.getElementById('dailyRewardHome').textContent = window.CONFIG.DAILY_BONUS_REWARD || 3;
+    document.getElementById('stepAdReward').textContent = window.CONFIG.AD_REWARD || 10;
+    document.getElementById('stepBonusReward').textContent = window.CONFIG.BONUS_AD_REWARD || 5;
+
+    function checkHourlyReset() {
+      const h = new Date().getHours();
+      const last = localStorage.getItem('last_ad_reset_hour');
+      if (last !== null && parseInt(last) !== h) { localStorage.setItem('hourly_ads_watched','0'); localStorage.setItem('last_ad_reset_hour', h.toString()); }
+      if (last === null) { localStorage.setItem('last_ad_reset_hour', h.toString()); localStorage.setItem('hourly_ads_watched','0'); }
+    }
+    function getHourlyAdsCount() { checkHourlyReset(); return parseInt(localStorage.getItem('hourly_ads_watched') || '0'); }
+    function getTimeUntilNextHour() {
+      const now = new Date(), next = new Date(now);
+      next.setHours(now.getHours()+1,0,0,0);
+      const m = Math.floor((next-now)/60000);
+      return m > 60 ? `${Math.floor(m/60)}ঘ ${m%60}মি` : `${m} মিনিট`;
+    }
+    function updateHomeUI() {
+      const c = getHourlyAdsCount();
+      const todayEl = document.getElementById('todayAds');
+      const resetEl = document.getElementById('resetTimer');
+      if (todayEl) todayEl.textContent = `${c}/10`;
+      if (resetEl) resetEl.textContent = `রিসেট: ${getTimeUntilNextHour()}`;
+    }
+    document.addEventListener('DOMContentLoaded', () => { setTimeout(() => { updateHomeUI(); setInterval(updateHomeUI, 60000); }, 1000); });
+  </script>
+</body>
+</html>
