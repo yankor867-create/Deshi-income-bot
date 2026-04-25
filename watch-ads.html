@@ -76,6 +76,13 @@
       🎬 এড দেখুন — <span id="watchBtnReward">10</span> ৳ আয় করুন
     </button>
 
+    <!-- টাস্ক পেজে ফিরে যান বাটন -->
+    <a href="tasks.html" style="text-decoration:none; display:block; margin-top:12px;">
+      <button class="btn-violet w-full fade-up fade-up-4" style="font-size:16px;padding:18px;border-radius:18px;">
+        📋 টাস্ক পেজে ফিরে যান
+      </button>
+    </a>
+
     <div class="glass-card-dark p-4 mt-5 fade-up fade-up-4">
       <h4 style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:10px;">📌 নির্দেশনা</h4>
       <div style="display:flex;flex-direction:column;gap:8px;">
@@ -202,8 +209,7 @@
       const user = window.getCurrentUser ? window.getCurrentUser() : null;
       if (!user) {
         const msg = 'ডেটা লোড হয়নি! পেজ রিফ্রেশ করুন।';
-        if (tg) tg.showAlert(msg);
-        else alert(msg);
+        if (tg) tg.showAlert(msg); else alert(msg);
         return;
       }
       
@@ -212,15 +218,13 @@
       
       if (count >= 10) {
         const msg = 'এই ঘন্টায় লিমিট শেষ!';
-        if (tg) tg.showAlert(msg);
-        else alert(msg);
+        if (tg) tg.showAlert(msg); else alert(msg);
         return;
       }
       
       if (adOpened) {
         const msg = 'এড ইতিমধ্যে খোলা আছে!';
-        if (tg) tg.showAlert(msg);
-        else alert(msg);
+        if (tg) tg.showAlert(msg); else alert(msg);
         return;
       }
 
@@ -257,8 +261,8 @@
     async function finishAd() {
       document.getElementById('countdownOverlay').style.display = 'none';
       
-      const currentCount = getHourlyAdsCount();
-      localStorage.setItem('hourly_ads_watched', (currentCount + 1).toString());
+      // ❌ No manual localStorage increment here!
+      // Only addEarning() handles the count.
       
       const result = await window.addEarning(AD_REWARD);
       await updateUI();
@@ -266,13 +270,10 @@
       if (result && result.success) {
         const newCount = getHourlyAdsCount();
         const msg = `✅ ${AD_REWARD} টাকা যোগ হয়েছে! এই ঘন্টায় ${newCount}/10`;
-        if (tg) tg.showAlert(msg);
-        else alert(msg);
+        if (tg) tg.showAlert(msg); else alert(msg);
       } else {
-        localStorage.setItem('hourly_ads_watched', currentCount.toString());
         const msg = result?.error || '❌ কোনো সমস্যা হয়েছে।';
-        if (tg) tg.showAlert(msg);
-        else alert(msg);
+        if (tg) tg.showAlert(msg); else alert(msg);
       }
       
       adOpened = false;

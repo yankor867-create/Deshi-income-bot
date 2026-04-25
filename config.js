@@ -8,8 +8,13 @@ window.CONFIG = {
     APP_URL: 'https://deshi-income-bot.vercel.app/',   // ← change this to your Vercel URL!
     AD_LINKS: [
         'https://omg10.com/4/9809044',
+        'https://omg10.com/4/9550427',
         'https://shingledirt.com/img7n81xh8?key=60effca0c228e66afd204784027d8b16',
-        'https://wwp.giriutan.com/redirect-zone/d37be84c'
+        'https://wwp.giriutan.com/redirect-zone/d37be84c',
+        'https://omg10.com/4/9809044',
+        'https://omg10.com/4/9550427',
+        'https://wwp.giriutan.com/redirect-zone/d37be84c',
+        'https://omg10.com/4/9809044'
     ],
     AD_REWARD: 10,
     BONUS_AD_REWARD: 5,
@@ -25,8 +30,8 @@ window.CONFIG = {
     DAILY_BONUS_LIMIT: 50,
     PAYMENT_PROOF_CHANNEL: '',
     ADMIN_TELEGRAM: '',
-    YOUTUBE_CHANNEL: 'https://youtube.com/@mishtikumra-y8v',
-    TELEGRAM_CHANNEL: 'https://t.me/mishti_kumra_official',
+    YOUTUBE_CHANNEL: 'https://youtube.com/@deshiincome-o6d?si=ZlTi1hm-UhuIleTR',
+    TELEGRAM_CHANNEL: 'https://t.me/deshiincomeofficial',
     APP_NAME: 'দেশী ইনকাম',
     APP_NAME_EN: 'Deshi Income',
     CURRENCY_SYMBOL: '৳',
