@@ -12,7 +12,6 @@
 <body class="min-h-screen pb-24">
 
   <div class="container mx-auto px-4 py-5">
-
     <div class="text-center mb-6 fade-up fade-up-1">
       <div style="width:72px;height:72px;background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.25);border-radius:22px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;" class="float">
         <i class="fas fa-users" style="color:var(--violet);font-size:30px;"></i>
@@ -47,18 +46,10 @@
         <code style="color:var(--violet);font-size:12px;line-height:1.6;" id="referralLink">লোড হচ্ছে...</code>
       </div>
       <div style="display:flex;gap:8px;">
-        <button id="copyLinkBtn" class="btn-violet" style="flex:1;font-size:14px;padding:13px;">
-          📋 লিঙ্ক কপি করুন
-        </button>
-        <button id="shareLinkBtn" class="btn-emerald" style="flex:1;font-size:14px;padding:13px;">
-          📤 শেয়ার করুন
-        </button>
+        <button id="copyLinkBtn" class="btn-violet" style="flex:1;font-size:14px;padding:13px;">📋 লিঙ্ক কপি করুন</button>
+        <button id="shareLinkBtn" class="btn-emerald" style="flex:1;font-size:14px;padding:13px;">📤 শেয়ার করুন</button>
       </div>
     </div>
-
-    <button id="refreshBtn" class="btn-emerald w-full mb-4" style="font-size:14px;padding:13px;">
-      🔄 রেফারেল কাউন্ট রিফ্রেশ করুন
-    </button>
 
     <div class="glass-card p-5 fade-up fade-up-4">
       <h3 style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:14px;display:flex;align-items:center;gap:8px;">
@@ -106,30 +97,22 @@
     const tg = window.Telegram?.WebApp;
     let currentReferralLink = '';
 
-    if (tg) {
-      tg.ready();
-      tg.expand();
-    }
+    if (tg) { tg.ready(); tg.expand(); }
 
     async function updateReferralUI() {
       const user = window.getCurrentUser ? window.getCurrentUser() : null;
-      
       if (!user || !user.id) {
         document.getElementById('referralLink').textContent = 'ইউজার লোড হচ্ছে...';
         return;
       }
-
-      // Update counts from current user data
       const count = Number(user.total_referrals) || 0;
       document.getElementById('totalReferrals').textContent = count;
       document.getElementById('referralBonus').textContent = (count * 100).toFixed(0);
 
-      // Set the referral link
       const botUsername = window.CONFIG?.BOT_USERNAME || 'deshiincomebot';
       currentReferralLink = `https://t.me/${botUsername}?startapp=ref${user.id}`;
       document.getElementById('referralLink').textContent = currentReferralLink;
 
-      // Load referrals list
       try {
         const referrals = await window.loadMyReferrals();
         const listContainer = document.getElementById('referralsList');
@@ -147,23 +130,19 @@
           listContainer.innerHTML = '<p class="text-center" style="color:var(--text-dim);padding:20px;">কোনো রেফারেল নেই</p>';
         }
       } catch (e) {
-        console.error('Failed to load referrals:', e);
         document.getElementById('referralsList').innerHTML = '<p class="text-center" style="color:var(--text-dim);padding:20px;">লোড করতে সমস্যা হয়েছে</p>';
       }
     }
 
     function copyReferralLink() {
       if (!currentReferralLink || currentReferralLink.includes('লোড')) {
-        const msg = 'লিঙ্ক এখনো লোড হয়নি। একটু অপেক্ষা করুন।';
-        if (tg) tg.showAlert(msg);
-        else alert(msg);
+        const msg = 'লিঙ্ক এখনো লোড হয়নি।';
+        if (tg) tg.showAlert(msg); else alert(msg);
         return;
       }
-
       navigator.clipboard.writeText(currentReferralLink).then(() => {
         const msg = '✅ রেফারেল লিঙ্ক কপি হয়েছে!';
-        if (tg) tg.showAlert(msg);
-        else alert(msg);
+        if (tg) tg.showAlert(msg); else alert(msg);
       }).catch(() => {
         const textarea = document.createElement('textarea');
         textarea.value = currentReferralLink;
@@ -172,21 +151,17 @@
         document.execCommand('copy');
         document.body.removeChild(textarea);
         const msg = '✅ রেফারেল লিঙ্ক কপি হয়েছে!';
-        if (tg) tg.showAlert(msg);
-        else alert(msg);
+        if (tg) tg.showAlert(msg); else alert(msg);
       });
     }
 
     function shareReferralLink() {
       if (!currentReferralLink || currentReferralLink.includes('লোড')) {
-        const msg = 'লিঙ্ক এখনো লোড হয়নি। একটু অপেক্ষা করুন।';
-        if (tg) tg.showAlert(msg);
-        else alert(msg);
+        const msg = 'লিঙ্ক এখনো লোড হয়নি।';
+        if (tg) tg.showAlert(msg); else alert(msg);
         return;
       }
-
       const shareText = `🇧🇩 দেশী ইনকামে জয়েন করুন!\n\n💰 সাইন আপ বোনাস: ৫০ টাকা\n🎬 প্রতি এড: ৩০ টাকা\n👥 রেফারেল বোনাস: ১০০ টাকা\n\n👇 লিঙ্ক:\n${currentReferralLink}`;
-
       if (tg && typeof tg.openTelegramLink === 'function') {
         const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(currentReferralLink)}&text=${encodeURIComponent('দেশী ইনকামে জয়েন করে টাকা আয় করুন!')}`;
         tg.openTelegramLink(shareUrl);
@@ -201,35 +176,7 @@
       }
     }
 
-    async function refreshReferralCount() {
-      const btn = document.getElementById('refreshBtn');
-      const originalText = btn.innerHTML;
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> রিফ্রেশ হচ্ছে...';
-      btn.disabled = true;
-      
-      try {
-        if (window.refreshMyReferralCount) {
-          await window.refreshMyReferralCount();  // This updates currentUser and UI
-        } else {
-          await window.loadUser();
-        }
-        await updateReferralUI();
-        const user = window.getCurrentUser();
-        const newCount = user?.total_referrals || 0;
-        const msg = `✅ রেফারেল কাউন্ট আপডেট হয়েছে: ${newCount} জন`;
-        if (tg) tg.showAlert(msg);
-        else alert(msg);
-      } catch (error) {
-        const msg = '❌ রিফ্রেশ করতে সমস্যা হয়েছে।';
-        if (tg) tg.showAlert(msg);
-        else alert(msg);
-      }
-      
-      btn.innerHTML = originalText;
-      btn.disabled = false;
-    }
-
-    // Wait for user data and then update UI (only once)
+    // Load once on DOM ready
     let attempts = 0;
     function waitForUser() {
       const user = window.getCurrentUser ? window.getCurrentUser() : null;
@@ -239,17 +186,14 @@
         attempts++;
         setTimeout(waitForUser, 200);
       } else {
-        document.getElementById('referralLink').textContent = 'ডেটা লোড হয়নি – রিফ্রেশ করুন';
+        document.getElementById('referralLink').textContent = 'ডেটা লোড হয়নি';
       }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('copyLinkBtn').addEventListener('click', copyReferralLink);
       document.getElementById('shareLinkBtn').addEventListener('click', shareReferralLink);
-      document.getElementById('refreshBtn').addEventListener('click', refreshReferralCount);
-      
-      waitForUser();   // initial load
-      // NO setInterval – no more auto-refresh!
+      waitForUser();
     });
   </script>
 </body>

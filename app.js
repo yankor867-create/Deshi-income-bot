@@ -1,5 +1,6 @@
-// app.js - দেশী ইনকাম
-// Production Version 2.0.2
+// app.js - দেশী ইনকাম (v2.0.3)
+// Fixed: refreshMyReferralCount updates balance + total income
+// Referral page uses no auto-refresh (handled in referral.html)
 
 let currentUser = null;
 let updateDebounce = null;
@@ -12,7 +13,6 @@ function getTelegramUserId() {
     if (tg?.initDataUnsafe?.user?.id) {
         return tg.initDataUnsafe.user.id.toString();
     }
-    
     let userId = localStorage.getItem('deshi_temp_id');
     if (!userId) {
         userId = 'web_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
@@ -36,17 +36,14 @@ function getReferrerFromUrl() {
         if (param.startsWith('ref')) return param.replace('ref', '');
         if (param.match(/^\d+$/)) return param;
     }
-    
     const urlParams = new URLSearchParams(window.location.search);
     const startapp = urlParams.get('startapp');
     if (startapp) {
         if (startapp.startsWith('ref')) return startapp.replace('ref', '');
         if (startapp.match(/^\d+$/)) return startapp;
     }
-    
     const refParam = urlParams.get('ref');
     if (refParam) return refParam;
-    
     return null;
 }
 
@@ -77,19 +74,19 @@ function checkDailyReset() {
     }
 }
 
-function getHourlyAdsCount() { 
-    checkHourlyReset(); 
-    return parseInt(localStorage.getItem('hourly_ads_watched') || '0'); 
+function getHourlyAdsCount() {
+    checkHourlyReset();
+    return parseInt(localStorage.getItem('hourly_ads_watched') || '0');
 }
 
-function getBonusHourlyCount() { 
-    checkBonusHourlyReset(); 
-    return parseInt(localStorage.getItem('hourly_bonus_ads_watched') || '0'); 
+function getBonusHourlyCount() {
+    checkBonusHourlyReset();
+    return parseInt(localStorage.getItem('hourly_bonus_ads_watched') || '0');
 }
 
-function getDailyBonusCount() { 
-    checkDailyReset(); 
-    return parseInt(localStorage.getItem('daily_bonus_ads') || '0'); 
+function getDailyBonusCount() {
+    checkDailyReset();
+    return parseInt(localStorage.getItem('daily_bonus_ads') || '0');
 }
 
 // ============================================
@@ -106,15 +103,13 @@ async function loadUser() {
     if (user) {
         currentUser = user;
         try {
-            const freshCount = await window.refreshReferralCount(userId);
-            if (freshCount !== currentUser.total_referrals) {
-                currentUser.total_referrals = freshCount;
-            }
-        } catch (e) { 
-            console.warn('Referral refresh failed:', e); 
+            // Refresh referral count on every load (also updates balance/income)
+            await refreshMyReferralCount();
+        } catch (e) {
+            console.warn('Referral refresh failed:', e);
         }
     } else {
-        // Create new user without a referrer (will be added after referral record)
+        // Create new user (referred_by = null)
         const newUser = {
             id: userId,
             first_name: firstName,
@@ -128,13 +123,13 @@ async function loadUser() {
             total_income: window.CONFIG.SIGNUP_BONUS,
             join_date: new Date().toISOString(),
             last_active: new Date().toISOString(),
-            referred_by: null   // will be updated later if referral succeeds
+            referred_by: null
         };
-        
+
         user = await window.createUserOptimized(newUser);
-        if (!user) { 
-            updateUI(); 
-            return null; 
+        if (!user) {
+            updateUI();
+            return null;
         }
         currentUser = user;
 
@@ -142,12 +137,11 @@ async function loadUser() {
         if (referrerId && referrerId !== userId) {
             try {
                 const referralResult = await window.createReferralRecord(
-                    referrerId, 
-                    userId, 
-                    firstName, 
+                    referrerId,
+                    userId,
+                    firstName,
                     'telegram_startapp'
                 );
-                
                 if (referralResult.success) {
                     // Add referral bonus to new user
                     const newBalance = window.CONFIG.SIGNUP_BONUS + window.CONFIG.REFERRED_BONUS;
@@ -159,13 +153,11 @@ async function loadUser() {
                             referred_by: referrerId
                         })
                         .eq('id', userId);
-                    
                     if (!error) {
                         currentUser.balance = newBalance;
                         currentUser.total_income = newBalance;
                         currentUser.referred_by = referrerId;
                     }
-                    
                     setTimeout(() => {
                         alert('🎉 রেফারেল বোনাস! আপনি ৫০ টাকা এবং আপনার রেফারার ১০০ টাকা পেয়েছেন!');
                     }, 1000);
@@ -174,10 +166,10 @@ async function loadUser() {
                 console.error('Referral error:', e);
             }
         }
-        
-        localStorage.setItem(`deshi_user_${userId}`, JSON.stringify({ 
-            data: currentUser, 
-            timestamp: Date.now() 
+
+        localStorage.setItem(`deshi_user_${userId}`, JSON.stringify({
+            data: currentUser,
+            timestamp: Date.now()
         }));
     }
 
@@ -187,14 +179,27 @@ async function loadUser() {
 
 async function refreshMyReferralCount() {
     if (!currentUser) return 0;
-    const newCount = await window.refreshReferralCount(currentUser.id);
-    currentUser.total_referrals = newCount;
-    localStorage.setItem(`deshi_user_${currentUser.id}`, JSON.stringify({ 
-        data: currentUser, 
-        timestamp: Date.now() 
-    }));
-    updateUI();
-    return newCount;
+    try {
+        const result = await window.refreshReferralCount(currentUser.id);
+        // result is an object { total_referrals, balance, total_income }
+        if (typeof result === 'object' && result !== null) {
+            currentUser.total_referrals = result.total_referrals;
+            currentUser.balance = result.balance;
+            currentUser.total_income = result.total_income;
+        } else {
+            // fallback if old implementation returns just number
+            currentUser.total_referrals = result;
+        }
+        localStorage.setItem(`deshi_user_${currentUser.id}`, JSON.stringify({
+            data: currentUser,
+            timestamp: Date.now()
+        }));
+        updateUI();
+        return currentUser.total_referrals;
+    } catch (e) {
+        console.error('refreshMyReferralCount error:', e);
+        return currentUser.total_referrals;
+    }
 }
 
 async function loadMyReferrals() {
@@ -207,10 +212,8 @@ async function loadMyReferrals() {
 // ============================================
 async function addEarning(amount) {
     if (!currentUser) return { success: false, error: 'ইউজার লোড হয়নি' };
-    
     checkHourlyReset();
     const hourlyCount = getHourlyAdsCount();
-    
     if (hourlyCount >= window.CONFIG.HOURLY_AD_LIMIT) {
         return { success: false, error: 'এই ঘন্টায় লিমিট শেষ!' };
     }
@@ -219,16 +222,14 @@ async function addEarning(amount) {
     currentUser.total_income = Number(currentUser.total_income || 0) + amount;
     currentUser.total_ads = Number(currentUser.total_ads || 0) + 1;
     currentUser.today_ads = Number(currentUser.today_ads || 0) + 1;
-    
+
     localStorage.setItem('hourly_ads_watched', (hourlyCount + 1).toString());
-    localStorage.setItem(`deshi_user_${currentUser.id}`, JSON.stringify({ 
-        data: currentUser, 
-        timestamp: Date.now() 
+    localStorage.setItem(`deshi_user_${currentUser.id}`, JSON.stringify({
+        data: currentUser,
+        timestamp: Date.now()
     }));
-    
     updateUI();
 
-    // Save to DB
     try {
         await window.supabase
             .from('users')
@@ -241,10 +242,8 @@ async function addEarning(amount) {
                 last_ad_reset: new Date().toISOString()
             })
             .eq('id', currentUser.id);
-        
-        // Log for anti-cheat
+
         await window.logAdWatch(currentUser.id, 'main', amount);
-        
     } catch (e) {
         console.error('addEarning DB failed:', e);
     }
@@ -254,10 +253,8 @@ async function addEarning(amount) {
 
 async function addBonusEarning(amount) {
     if (!currentUser) return { success: false, error: 'ইউজার লোড হয়নি' };
-    
     checkBonusHourlyReset();
     const hourlyCount = getBonusHourlyCount();
-    
     if (hourlyCount >= window.CONFIG.HOURLY_BONUS_LIMIT) {
         return { success: false, error: 'বোনাস লিমিট শেষ!' };
     }
@@ -265,13 +262,12 @@ async function addBonusEarning(amount) {
     currentUser.balance = Number(currentUser.balance || 0) + amount;
     currentUser.total_income = Number(currentUser.total_income || 0) + amount;
     currentUser.today_bonus_ads = Number(currentUser.today_bonus_ads || 0) + 1;
-    
+
     localStorage.setItem('hourly_bonus_ads_watched', (hourlyCount + 1).toString());
-    localStorage.setItem(`deshi_user_${currentUser.id}`, JSON.stringify({ 
-        data: currentUser, 
-        timestamp: Date.now() 
+    localStorage.setItem(`deshi_user_${currentUser.id}`, JSON.stringify({
+        data: currentUser,
+        timestamp: Date.now()
     }));
-    
     updateUI();
 
     try {
@@ -285,9 +281,8 @@ async function addBonusEarning(amount) {
                 last_bonus_ad_reset: new Date().toISOString()
             })
             .eq('id', currentUser.id);
-        
+
         await window.logAdWatch(currentUser.id, 'bonus', amount);
-        
     } catch (e) {
         console.error('addBonusEarning DB failed:', e);
     }
@@ -297,10 +292,8 @@ async function addBonusEarning(amount) {
 
 async function addDailyBonusEarning(amount) {
     if (!currentUser) return { success: false };
-    
     checkDailyReset();
     const dailyCount = getDailyBonusCount();
-    
     if (dailyCount >= window.CONFIG.DAILY_BONUS_LIMIT) {
         return { success: false, error: 'দৈনিক লিমিট শেষ!' };
     }
@@ -308,13 +301,12 @@ async function addDailyBonusEarning(amount) {
     currentUser.balance = Number(currentUser.balance || 0) + amount;
     currentUser.total_income = Number(currentUser.total_income || 0) + amount;
     currentUser.today_bonus_ads_2 = Number(currentUser.today_bonus_ads_2 || 0) + 1;
-    
+
     localStorage.setItem('daily_bonus_ads', (dailyCount + 1).toString());
-    localStorage.setItem(`deshi_user_${currentUser.id}`, JSON.stringify({ 
-        data: currentUser, 
-        timestamp: Date.now() 
+    localStorage.setItem(`deshi_user_${currentUser.id}`, JSON.stringify({
+        data: currentUser,
+        timestamp: Date.now()
     }));
-    
     updateUI();
 
     try {
@@ -328,9 +320,8 @@ async function addDailyBonusEarning(amount) {
                 last_bonus_ad_reset_2: new Date().toISOString()
             })
             .eq('id', currentUser.id);
-        
+
         await window.logAdWatch(currentUser.id, 'daily', amount);
-        
     } catch (e) {
         console.error('addDailyBonusEarning DB failed:', e);
     }
@@ -340,17 +331,15 @@ async function addDailyBonusEarning(amount) {
 
 async function addBonus(amount) {
     if (!currentUser) return;
-    
     currentUser.balance = Number(currentUser.balance || 0) + amount;
     currentUser.total_income = Number(currentUser.total_income || 0) + amount;
-    
-    localStorage.setItem(`deshi_user_${currentUser.id}`, JSON.stringify({ 
-        data: currentUser, 
-        timestamp: Date.now() 
+
+    localStorage.setItem(`deshi_user_${currentUser.id}`, JSON.stringify({
+        data: currentUser,
+        timestamp: Date.now()
     }));
-    
     updateUI();
-    
+
     try {
         await window.supabase
             .from('users')
@@ -372,15 +361,15 @@ async function requestWithdraw(amount, accountNumber, method) {
     if (!currentUser) return { success: false, error: 'ইউজার লোড হয়নি' };
     if (amount > currentUser.balance) return { success: false, error: 'ব্যালেন্স অপর্যাপ্ত!' };
     if (Number(currentUser.total_referrals || 0) < window.CONFIG.MIN_REFERRALS) {
-        return { 
-            success: false, 
-            error: `${window.CONFIG.MIN_REFERRALS} জন রেফারেল প্রয়োজন! (বর্তমানে: ${currentUser.total_referrals || 0})` 
+        return {
+            success: false,
+            error: `${window.CONFIG.MIN_REFERRALS} জন রেফারেল প্রয়োজন! (বর্তমানে: ${currentUser.total_referrals || 0})`
         };
     }
     if (Number(currentUser.total_ads || 0) < window.CONFIG.MIN_TOTAL_ADS) {
-        return { 
-            success: false, 
-            error: `${window.CONFIG.MIN_TOTAL_ADS}টি এড প্রয়োজন! (বর্তমানে: ${currentUser.total_ads || 0})` 
+        return {
+            success: false,
+            error: `${window.CONFIG.MIN_TOTAL_ADS}টি এড প্রয়োজন! (বর্তমানে: ${currentUser.total_ads || 0})`
         };
     }
     if (amount < window.CONFIG.MIN_WITHDRAW) {
@@ -399,12 +388,12 @@ async function requestWithdraw(amount, accountNumber, method) {
 
     if (result.success) {
         currentUser.balance = Number(currentUser.balance) - amount;
-        localStorage.setItem(`deshi_user_${currentUser.id}`, JSON.stringify({ 
-            data: currentUser, 
-            timestamp: Date.now() 
+        localStorage.setItem(`deshi_user_${currentUser.id}`, JSON.stringify({
+            data: currentUser,
+            timestamp: Date.now()
         }));
         updateUI();
-        
+
         try {
             await window.supabase
                 .from('users')
@@ -416,10 +405,8 @@ async function requestWithdraw(amount, accountNumber, method) {
         } catch (e) {
             console.error('Withdraw balance deduct failed:', e);
         }
-        
         return { success: true, message: 'উত্তোলন রিকোয়েস্ট সফল! ২৪-৪৮ ঘন্টার মধ্যে পেমেন্ট করা হবে।' };
     }
-    
     return result;
 }
 
@@ -429,7 +416,6 @@ async function requestWithdraw(amount, accountNumber, method) {
 async function copyReferralLink() {
     if (!currentUser) return;
     const link = `https://t.me/${window.CONFIG.BOT_USERNAME}?startapp=ref${currentUser.id}`;
-    
     try {
         await navigator.clipboard.writeText(link);
         alert('✅ রেফারেল লিঙ্ক কপি হয়েছে!');
@@ -449,7 +435,6 @@ async function copyReferralLink() {
 // ============================================
 function updateUI() {
     if (!currentUser) return;
-    
     if (updateDebounce) clearTimeout(updateDebounce);
     updateDebounce = setTimeout(() => {
         const balanceEl = document.getElementById('mainBalance');
@@ -475,12 +460,12 @@ function updateUI() {
     }, 50);
 }
 
-function getCurrentUser() { 
-    return currentUser; 
+function getCurrentUser() {
+    return currentUser;
 }
 
-function getUserData() { 
-    return currentUser; 
+function getUserData() {
+    return currentUser;
 }
 
 function checkAllResets() {
@@ -496,10 +481,8 @@ function checkAllResets() {
 async function completeTelegramTask() {
     if (!currentUser) return { success: false };
     if (currentUser.task_telegram) return { success: false, error: 'ইতিমধ্যে সম্পন্ন হয়েছে!' };
-    
     window.open(window.CONFIG.TELEGRAM_CHANNEL, '_blank');
     await addBonus(50);
-    
     try {
         await window.supabase
             .from('users')
@@ -509,17 +492,14 @@ async function completeTelegramTask() {
     } catch (e) {
         console.error('Task update error:', e);
     }
-    
     return { success: true };
 }
 
 async function completeYoutubeTask() {
     if (!currentUser) return { success: false };
     if (currentUser.task_youtube) return { success: false, error: 'ইতিমধ্যে সম্পন্ন হয়েছে!' };
-    
     window.open(window.CONFIG.YOUTUBE_CHANNEL, '_blank');
     await addBonus(50);
-    
     try {
         await window.supabase
             .from('users')
@@ -529,7 +509,6 @@ async function completeYoutubeTask() {
     } catch (e) {
         console.error('Task update error:', e);
     }
-    
     return { success: true };
 }
 
@@ -559,19 +538,19 @@ window.completeYoutubeTask = completeYoutubeTask;
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
     const tg = window.Telegram?.WebApp;
-    if (tg) { 
-        tg.expand(); 
+    if (tg) {
+        tg.expand();
         tg.ready();
         tg.setHeaderColor('#060B18');
         tg.setBackgroundColor('#060B18');
     }
-    
+
     checkAllResets();
     setInterval(checkAllResets, 60000);
-    
+
     await loadUser();
-    
-    // Periodic sync every 10 minutes
+
+    // Periodic sync every 10 minutes (updates balance, income, referrals)
     setInterval(async () => {
         if (currentUser) {
             try {
@@ -579,9 +558,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const freshUser = await window.getUserDataOptimized(currentUser.id);
                 if (freshUser) {
                     currentUser = freshUser;
-                    localStorage.setItem(`deshi_user_${currentUser.id}`, JSON.stringify({ 
-                        data: currentUser, 
-                        timestamp: Date.now() 
+                    localStorage.setItem(`deshi_user_${currentUser.id}`, JSON.stringify({
+                        data: currentUser,
+                        timestamp: Date.now()
                     }));
                     updateUI();
                 }
