@@ -8,6 +8,141 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* Custom modal styles - consistent with app design */
+    .rules-modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(6, 11, 24, 0.96);
+      backdrop-filter: blur(20px);
+      z-index: 10000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+    .rules-modal.active {
+      display: flex;
+      opacity: 1;
+    }
+    .rules-content {
+      max-width: 500px;
+      width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+      background: linear-gradient(145deg, #0F172A, #0A0F1C);
+      border: 1px solid rgba(245, 200, 66, 0.25);
+      border-radius: 32px;
+      padding: 24px 20px;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8), 0 0 0 1px rgba(245,200,66,0.15);
+      position: relative;
+    }
+    .rules-content::-webkit-scrollbar { width: 4px; }
+    .rules-content::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 10px; }
+    .rules-content::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
+    .rule-title {
+      font-size: 22px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--gold-light), var(--gold));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .rule-section {
+      background: rgba(255,255,255,0.03);
+      border-radius: 20px;
+      padding: 16px;
+      margin-bottom: 18px;
+      border: 1px solid rgba(255,255,255,0.05);
+      transition: all 0.2s;
+    }
+    .rule-section h4 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .rule-section ul, .rule-section p {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-left: 20px;
+      list-style-type: disc;
+    }
+    .rule-section li { margin-bottom: 6px; }
+    .highlight {
+      color: var(--gold);
+      font-weight: 600;
+    }
+    .close-modal {
+      background: rgba(255,255,255,0.05);
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: all 0.2s;
+    }
+    .close-modal:hover {
+      background: rgba(245,200,66,0.15);
+      color: var(--gold);
+    }
+    /* ===== EXTRA LARGE, FULL-WIDTH RULES BUTTON ===== */
+    .rules-btn-massive {
+      background: linear-gradient(115deg, #FFF5E0, #FFEFC0);
+      border: none;
+      border-radius: 28px;
+      padding: 20px 16px;
+      font-size: 22px;
+      font-weight: 800;
+      color: #2C1A00;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: 0 12px 28px rgba(245, 200, 66, 0.5);
+      letter-spacing: 1px;
+      width: 100%;
+      text-align: center;
+      margin: 8px 0 16px 0;
+    }
+    .rules-btn-massive i {
+      font-size: 32px;
+      color: #E6A100;
+    }
+    .rules-btn-massive:hover {
+      transform: translateY(-3px);
+      background: linear-gradient(115deg, #FFEFCF, #FFE8B5);
+      box-shadow: 0 18px 32px rgba(245, 200, 66, 0.7);
+      color: #1F1300;
+    }
+    .rules-btn-massive:active {
+      transform: translateY(1px);
+    }
+    .divider-gold {
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(245,200,66,0.4), transparent);
+      margin: 8px 0 16px;
+    }
+    /* header action row - remove old small button */
+    .action-header {
+      margin-bottom: 8px;
+    }
+  </style>
 </head>
 <body class="min-h-screen pb-24">
 
@@ -22,7 +157,6 @@
   </div>
 
   <div class="container mx-auto px-4 py-5">
-
   
     <!-- Header -->
     <div class="flex justify-between items-center mb-5 fade-up fade-up-2">
@@ -61,7 +195,8 @@
         <div style="text-align:right;"><p style="font-size:11px;color:rgba(245,200,66,0.5);">রেফারেল</p><p style="font-size:18px;font-weight:700;color:var(--text-primary);" id="totalReferrals">0</p></div>
       </div>
     </div>
-  <!-- ⚠️ Bot Warning Card -->
+
+    <!-- Bot Warning Card -->
     <div class="balance-card p-5 mb-5 fade-up fade-up-1" style="border-color: rgba(255,92,138,0.4); background: linear-gradient(135deg, rgba(255,92,138,0.08), rgba(255,92,138,0.02));">
       <div class="flex items-start gap-3">
         <div style="font-size:28px;">⚠️</div>
@@ -103,8 +238,15 @@
       </div>
     </div>
 
+    <!-- BIG FULL-WIDTH RULES BUTTON (visible to all) -->
+    <button id="showRulesBtn" class="rules-btn-massive fade-up fade-up-4">
+      <i class="fas fa-scroll"></i> 📜 সম্পূর্ণ কাজের নিয়ম দেখুন
+    </button>
+    
     <!-- Action Grid -->
-    <p style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px;" class="fade-up fade-up-4">দ্রুত অ্যাকশন</p>
+    <div class="action-header fade-up fade-up-4">
+      <p style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px;">দ্রুত অ্যাকশন</p>
+    </div>
     <div class="grid grid-cols-2 gap-3 mb-5 fade-up fade-up-4">
       <a href="tasks.html" style="text-decoration:none;" class="task-card emerald-glow p-4 block">
         <div style="width:40px;height:40px;background:rgba(0,212,168,0.12);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;">
@@ -173,9 +315,75 @@
         </div>
         <div class="check-item">
           <div class="step-num" style="background:rgba(255,92,138,0.1);color:var(--rose);">৪</div>
-          <p style="font-size:13px;color:var(--text-muted);padding-top:6px;">দৈনিক বোনাস — প্রতিদিন সর্বোচ্চ <span style="color:var(--rose);font-weight:700;">২৫০ টাকা</span></p>
+          <p style="font-size:13px;color:var(--text-muted);padding-top:6px;">দৈনিক বোনাস — প্রতিদিন সর্বোচ্চ <span style="color:var(--rose);font-weight:700;">১৫০ টাকা</span></p>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- ========== RULES MODAL (POPUP) ========== -->
+  <div id="rulesModal" class="rules-modal">
+    <div class="rules-content">
+      <div class="rule-title">
+        <span><i class="fas fa-gavel" style="margin-right: 8px;"></i> সম্পূর্ণ কাজের নিয়মাবলী</span>
+        <button id="closeRulesModal" class="close-modal"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="divider-gold"></div>
+      
+      <div class="rule-section">
+        <h4><i class="fas fa-eye" style="color: var(--emerald);"></i> ১. এড দেখা</h4>
+        <ul>
+          <li><span class="highlight">প্রধান এড</span> ➜ প্রতি এডে <strong>১০ টাকা</strong> আয়। প্রতি ঘন্টায় সর্বোচ্চ ১০টি এড দেখা যাবে।</li>
+          <li><span class="highlight">বোনাস এড</span> ➜ প্রতি এডে <strong>৫ টাকা</strong> আয়। এই ঘন্টায় ১০টি পর্যন্ত দেখা যাবে।</li>
+          <li><span class="highlight">দৈনিক বোনাস</span> ➜ প্রতিদিন ৫০টি এড (প্রতি এড ৩ টাকা) = মোট ১৫০ টাকা আয় করা সম্ভব।</li>
+          <li>এড দেখার পর ১৫/৩০ সেকেন্ড অপেক্ষা করতে হবে (কাউন্টডাউন শেষে স্বয়ংক্রিয়ভাবে টাকা যোগ হবে)।</li>
+          <li>প্রতিটি এড দেখার রেকর্ড সংরক্ষিত হয় এবং প্রতারণা করলে অ্যাকাউন্ট ব্লক হতে পারে।</li>
+        </ul>
+      </div>
+
+      <div class="rule-section">
+        <h4><i class="fas fa-users" style="color: var(--violet);"></i> ২. রেফারেল প্রোগ্রাম</h4>
+        <ul>
+          <li>আপনার রেফারেল লিংক দিয়ে যারা জয়েন করবে, তারা <span class="highlight">৫০ টাকা সাইনআপ বোনাস</span> পাবে।</li>
+          <li>আর আপনি পাবেন <span class="highlight">প্রতি রেফারেল ১০০ টাকা</span> (সরাসরি ব্যালেন্সে যুক্ত হবে)।</li>
+          <li>রেফারেল বোনাস পাওয়ার জন্য রেফার্ড ইউজারকে কমপক্ষে ১টি এড দেখতে হবে না – সাইনআপ করলেই বোনাস যুক্ত হয়।</li>
+          <li>আপনার রেফারেল কাউন্ট যত বেশি, উত্তোলনের শর্ত পূরণে সহায়তা করবে।</li>
+        </ul>
+      </div>
+
+      <div class="rule-section">
+        <h4><i class="fas fa-coins" style="color: var(--gold);"></i> ৩. বোনাস ও অফার</h4>
+        <ul>
+          <li><span class="highlight">সাইনআপ বোনাস:</span> নতুন ইউজার নিবন্ধন করার সাথে সাথে পান <strong>৫০ টাকা</strong>।</li>
+          <li><span class="highlight">টেলিগ্রাম চ্যানেল জয়েন:</span> ৫০ টাকা</li>
+          <li><span class="highlight">ইউটিউব সাবস্ক্রাইব:</span> ৫০ টাকা</li>
+          <li>প্রতিদিন ভোর ৬টায় দৈনিক বোনাস কাউন্ট রিসেট হয়। ঘন্টাভিত্তিক লিমিট রিসেট হয় প্রতি ঘন্টার শুরুতে।</li>
+        </ul>
+      </div>
+
+      <div class="rule-section">
+        <h4><i class="fas fa-hand-holding-usd" style="color: var(--rose);"></i> ৪. উত্তোলনের নিয়ম</h4>
+        <ul>
+          <li><span class="highlight">ন্যূনতম উত্তোলন সীমা:</span> <strong>৫০০ টাকা</strong>।</li>
+          <li><span class="highlight">রেফারেল প্রয়োজন:</span> ১৫ জন (সক্রিয় রেফারেল গণনা করা হয়)।</li>
+          <li><span class="highlight">মোট এড প্রয়োজন:</span> কমপক্ষে ৫০টি এড দেখতে হবে (প্রধান+বোনাস+দৈনিক সব মিলিয়ে)।</li>
+          <li>পেমেন্ট মাধ্যম: bKash, Nagad, Rocket, USDT (TRC20)। সঠিক একাউন্ট নম্বর প্রদান বাধ্যতামূলক।</li>
+          <li>উত্তোলন রিকোয়েস্ট করার পর <strong>২৪-৪৮ ঘন্টার মধ্যে</strong> পেমেন্ট দেওয়া হবে। পেমেন্ট প্রুফ <a href="https://t.me/deshiincomeofficial" target="_blank" style="color: var(--gold);">টেলিগ্রাম চ্যানেল</a> এ আপলোড করা হবে।</li>
+          <li>যেকোনো প্রতারণা বা অসদুপায় অবলম্বন করলে উত্তোলন বাতিল এবং অ্যাকাউন্ট স্থায়ীভাবে ব্লক করা হবে।</li>
+        </ul>
+      </div>
+
+      <div class="rule-section">
+        <h4><i class="fas fa-exclamation-triangle" style="color: var(--gold);"></i> ৫. গুরুত্বপূর্ণ তথ্য</h4>
+        <ul>
+          <li>প্রতিটি এড দেখার আগে অবশ্যই <strong>@deshiincomebot</strong> ওপেন করুন এবং বটে স্টার্ট দিন। নাহলে পেমেন্ট পেতে সমস্যা হতে পারে।</li>
+          <li>ভুয়া বা একাধিক অ্যাকাউন্ট ব্যবহার করে কেউ রেফারেল বোনাস নিতে চাইলে তার সব অ্যাকাউন্ট ব্লক হবে এবং ব্যালেন্স জব্দ হবে।</li>
+          <li>সাপোর্টের জন্য টেলিগ্রাম চ্যানেলের সাথে যুক্ত থাকুন এবং আপডেট ফলো করুন।</li>
+          <li>যেকোনো সমস্যায় অ্যাডমিনের সাথে যোগাযোগ করুন (চ্যানেলের মাধ্যমেই উত্তর দেওয়া হবে)।</li>
+        </ul>
+      </div>
+      <div class="divider-gold" style="margin-top: 6px;"></div>
+      <p style="font-size: 12px; text-align: center; color: var(--text-dim); margin-top: 16px;">🇧🇩 দেশী ইনকাম – ঘরে বসে আয় করুন, সহজ ও নিরাপদ পদ্ধতি</p>
     </div>
   </div>
 
@@ -216,7 +424,33 @@
       document.getElementById('todayAds').textContent = `${c}/10`;
       document.getElementById('resetTimer').textContent = `রিসেট: ${getTimeUntilNextHour()}`;
     }
-    document.addEventListener('DOMContentLoaded', () => { setTimeout(() => { updateHomeUI(); setInterval(updateHomeUI, 60000); }, 1000); });
+    document.addEventListener('DOMContentLoaded', () => { 
+      setTimeout(() => { updateHomeUI(); setInterval(updateHomeUI, 60000); }, 1000);
+      
+      // 🟢 Rules Modal Logic (Big Visible Button for All)
+      const modal = document.getElementById('rulesModal');
+      const showBtn = document.getElementById('showRulesBtn');
+      const closeBtn = document.getElementById('closeRulesModal');
+      
+      function openModal() {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+      function closeModal() {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+      if (showBtn) showBtn.addEventListener('click', openModal);
+      if (closeBtn) closeBtn.addEventListener('click', closeModal);
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+      });
+      const tg = window.Telegram?.WebApp;
+      if (tg) {
+        tg.expand();
+        tg.ready();
+      }
+    });
   </script>
 </body>
 </html>
