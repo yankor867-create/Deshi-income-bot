@@ -35,6 +35,12 @@ window.CONFIG = {
     APP_NAME: 'দেশী ইনকাম',
     APP_NAME_EN: 'Deshi Income',
     CURRENCY_SYMBOL: '৳',
-    VERSION: '2.0.2'
+    VERSION: '2.0.3',
+    
+    // Adsgram Video Earn Configuration
+    ADSGRAM_BLOCK_ID: '29502',
+    VIDEO_AD_REWARD: 30,
+    DAILY_VIDEO_LIMIT: 20,
+    VIDEO_AD_COUNTDOWN: 30,
 };
 console.log('✅ দেশী ইনকাম কনফিগ লোড হয়েছে - v' + window.CONFIG.VERSION);

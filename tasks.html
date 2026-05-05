@@ -122,6 +122,42 @@
       </a>
     </div>
 
+    <!-- ========== NEW: VIDEO EARN SECTION ========== -->
+    <p style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px;" class="fade-up fade-up-3">ভিডিও আর্ন</p>
+
+    <!-- Video Earn Card (Adsgram) -->
+    <div class="task-card p-5 mb-4 fade-up fade-up-3" style="border-color:rgba(59,130,246,0.25);">
+      <div class="flex justify-between items-center mb-4">
+        <div class="flex items-center gap-3">
+          <div style="width:44px;height:44px;background:rgba(59,130,246,0.1);border-radius:14px;display:flex;align-items:center;justify-content:center;">
+            <i class="fas fa-video" style="color:#3B82F6;font-size:20px;"></i>
+          </div>
+          <div>
+            <h3 style="font-size:15px;font-weight:700;color:var(--text-primary);">ভিডিও দেখে আয়</h3>
+            <p style="font-size:11px;color:var(--text-muted);">প্রতিদিন ২০টি ভিডিও</p>
+          </div>
+        </div>
+        <span class="badge" style="background:rgba(59,130,246,0.1);color:#3B82F6;border-color:rgba(59,130,246,0.25);">৩০ ৳ / ভিডিও</span>
+      </div>
+
+      <div class="mb-4">
+        <div class="flex justify-between mb-2">
+          <span style="font-size:12px;color:var(--text-muted);">আজকের অগ্রগতি</span>
+          <span style="font-size:12px;font-weight:600;color:#3B82F6;"><span id="videoEarnCount">0</span>/20</span>
+        </div>
+        <div class="progress-track">
+          <div id="videoEarnProgress" class="progress-fill" style="width:0%; background: linear-gradient(90deg, #2563EB, #3B82F6);"></div>
+        </div>
+        <p style="font-size:10px;color:var(--text-dim);margin-top:6px;">রিসেট: প্রতিদিন</p>
+      </div>
+
+      <a href="video-earn.html" style="text-decoration:none;display:block;">
+        <button style="width:100%;padding:14px;background:linear-gradient(135deg,#2563EB,#3B82F6);border:none;color:#fff;border-radius:14px;font-weight:700;font-size:15px;cursor:pointer;transition:all 0.3s;box-shadow:0 8px 24px rgba(59,130,246,0.25);">
+          🎥 ভিডিও দেখুন
+        </button>
+      </a>
+    </div>
+
     <!-- Social Tasks -->
     <p style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px;" class="fade-up fade-up-3">সোশ্যাল টাস্ক</p>
 
@@ -161,6 +197,7 @@
 
   </div>
 
+  <!-- Bottom Navigation -->
   <div class="bottom-nav">
     <a href="index.html" class="nav-item"><i class="fas fa-home"></i><span>হোম</span></a>
     <a href="tasks.html" class="nav-item active"><i class="fas fa-tasks"></i><span>টাস্ক</span></a>
@@ -202,6 +239,27 @@
       const m = Math.floor((next-now)/60000);
       return m > 60 ? `${Math.floor(m/60)}ঘ ${m%60}মি` : `${m} মিনিট`;
     }
+
+    // ========== NEW: Video Earn Functions ==========
+    function checkDailyVideoReset() {
+      const today = new Date().toDateString();
+      const lastDate = localStorage.getItem('last_video_reset_date');
+      if (lastDate !== today) {
+        localStorage.setItem('daily_videos_watched', '0');
+        localStorage.setItem('last_video_reset_date', today);
+      }
+    }
+    function getDailyVideoCount() {
+      checkDailyVideoReset();
+      return parseInt(localStorage.getItem('daily_videos_watched') || '0');
+    }
+    function updateVideoEarnUI() {
+      const count = getDailyVideoCount();
+      document.getElementById('videoEarnCount').textContent = count;
+      document.getElementById('videoEarnProgress').style.width = `${(count / 20) * 100}%`;
+    }
+    // =============================================
+
     function updateUI() {
       const a = getHourlyAdsCount(), b = getHourlyBonusCount(), d = getDailyBonusCount();
       document.getElementById('todayAdsCount').textContent = a;
@@ -211,7 +269,9 @@
       document.getElementById('bonusProgressFill').style.width = `${(b/10)*100}%`;
       document.getElementById('dailyBonusProgress').style.width = `${(d/50)*100}%`;
       document.getElementById('resetTimer').textContent = getTimeUntilNextHour();
+      updateVideoEarnUI(); // NEW
     }
+
     async function completeTelegramTask() {
       if (localStorage.getItem('task_telegram')) { alert('✅ আপনি আগেই এই টাস্ক সম্পন্ন করেছেন!'); return; }
       window.open('https://t.me/deshiincomeofficial','_blank');

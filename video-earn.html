@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>ভিডিও দেখুন | দেশী ইনকাম</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <!-- Adsgram SDK -->
+  <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+</head>
+<body class="min-h-screen pb-24">
+
+  <!-- Countdown Overlay -->
+  <div id="countdownOverlay" class="countdown-overlay">
+    <div style="text-align:center;padding:32px;">
+      <div style="width:60px;height:60px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.3);border-radius:18px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+        <i class="fas fa-video" style="color:#3B82F6;font-size:26px;"></i>
+      </div>
+      <div class="countdown-ring" style="margin:0 auto 20px;">
+        <svg width="180" height="180" viewBox="0 0 180 180">
+          <circle cx="90" cy="90" r="80" fill="none" stroke="rgba(59,130,246,0.1)" stroke-width="6"/>
+          <circle id="countdownCircle" cx="90" cy="90" r="80" fill="none" stroke="#3B82F6" stroke-width="6"
+                  stroke-linecap="round" stroke-dasharray="502" stroke-dashoffset="0"
+                  transform="rotate(-90 90 90)" style="transition:stroke-dashoffset 1s linear;"/>
+        </svg>
+        <div class="countdown-number" id="countdownNumber" style="color:#3B82F6;">30</div>
+      </div>
+      <p style="color:var(--text-primary);font-size:16px;font-weight:600;">ভিডিও দেখুন...</p>
+      <p style="color:var(--text-muted);font-size:13px;margin-top:6px;" id="countdownStatus">৩০ সেকেন্ড অপেক্ষা করুন</p>
+    </div>
+  </div>
+
+  <div class="container mx-auto px-4 py-5">
+    
+    <!-- Header -->
+    <div class="flex items-center gap-3 mb-5 fade-up fade-up-1">
+      <a href="tasks.html" style="width:40px;height:40px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);text-decoration:none;">
+        <i class="fas fa-arrow-left"></i>
+      </a>
+      <div>
+        <h1 style="font-size:20px;font-weight:700;color:var(--text-primary);">ভিডিও দেখে আয়</h1>
+        <p style="font-size:12px;color:var(--text-muted);">প্রতি ভিডিওতে <span style="color:#3B82F6;font-weight:700;">৩০ টাকা</span> আয় করুন</p>
+      </div>
+    </div>
+
+    <!-- Stats Card -->
+    <div class="glass-card p-6 mb-5 text-center fade-up fade-up-2">
+      <div style="width:80px;height:80px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);border-radius:24px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;" class="float">
+        <i class="fas fa-play-circle" style="color:#3B82F6;font-size:36px;"></i>
+      </div>
+      <div style="font-size:48px;font-weight:800;font-family:'Sora',sans-serif;color:#3B82F6;">
+        <span id="videoCounter">0</span><span style="font-size:22px;opacity:0.5;">/20</span>
+      </div>
+      <div class="progress-track mt-3 mb-3">
+        <div id="videoProgressFill" class="progress-fill" style="width:0%; background: linear-gradient(90deg, #2563EB, #3B82F6);"></div>
+      </div>
+      <p style="font-size:13px;color:var(--text-muted);">প্রতি ভিডিওতে <span style="color:#3B82F6;font-weight:700;">৩০ টাকা</span></p>
+      <p style="font-size:11px;color:var(--text-dim);margin-top:4px;" id="resetTimer">পরবর্তী রিসেট: গণনা হচ্ছে...</p>
+    </div>
+
+    <!-- Earnings Info -->
+    <div class="grid grid-cols-2 gap-3 mb-5 fade-up fade-up-2">
+      <div class="stat-card" style="border-color:rgba(59,130,246,0.2);">
+        <p style="font-size:10px;color:var(--text-muted);margin-bottom:4px;">আজ আয় করেছেন</p>
+        <p style="font-size:22px;font-weight:800;color:#3B82F6;" id="earnedToday">0</p>
+        <p style="font-size:10px;color:var(--text-dim);">টাকা</p>
+      </div>
+      <div class="stat-card" style="border-color:rgba(245,200,66,0.15);">
+        <p style="font-size:10px;color:var(--text-muted);margin-bottom:4px;">সর্বোচ্চ আয়</p>
+        <p style="font-size:22px;font-weight:800;color:var(--gold);">৬০০</p>
+        <p style="font-size:10px;color:var(--text-dim);">টাকা/দিন</p>
+      </div>
+    </div>
+
+    <!-- Watch Button -->
+    <button onclick="window.watchVideoAd()" id="watchBtn" class="fade-up fade-up-3 w-full" 
+            style="font-size:16px;padding:18px;border-radius:18px;background:linear-gradient(135deg,#2563EB,#3B82F6);color:#fff;font-weight:700;border:none;cursor:pointer;transition:all 0.3s;box-shadow:0 8px 24px rgba(59,130,246,0.25);">
+      🎥 ভিডিও দেখুন — ৩০ ৳ আয় করুন
+    </button>
+
+    <!-- টাস্ক পেজে ফিরে যান -->
+    <a href="tasks.html" style="text-decoration:none; display:block; margin-top:12px;">
+      <button class="btn-violet w-full fade-up fade-up-3" style="font-size:16px;padding:18px;border-radius:18px;">
+        📋 টাস্ক পেজে ফিরে যান
+      </button>
+    </a>
+
+    <!-- Instructions -->
+    <div class="glass-card-dark p-4 mt-5 fade-up fade-up-4">
+      <h4 style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:10px;">
+        <i class="fas fa-info-circle" style="color:#3B82F6;"></i> নির্দেশনা
+      </h4>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;gap:8px;align-items:flex-start;">
+          <span style="color:#3B82F6;font-size:12px;margin-top:1px;">✓</span>
+          <p style="font-size:12px;color:var(--text-muted);">"ভিডিও দেখুন" বাটনে ক্লিক করুন</p>
+        </div>
+        <div style="display:flex;gap:8px;align-items:flex-start;">
+          <span style="color:#3B82F6;font-size:12px;margin-top:1px;">✓</span>
+          <p style="font-size:12px;color:var(--text-muted);">ভিডিও সম্পূর্ণ দেখুন (৩০ সেকেন্ড)</p>
+        </div>
+        <div style="display:flex;gap:8px;align-items:flex-start;">
+          <span style="color:#3B82F6;font-size:12px;margin-top:1px;">✓</span>
+          <p style="font-size:12px;color:var(--text-muted);">কাউন্টডাউন শেষ হলে ৩০ টাকা যোগ হবে</p>
+        </div>
+        <div style="display:flex;gap:8px;align-items:flex-start;">
+          <span style="color:#3B82F6;font-size:12px;margin-top:1px;">✓</span>
+          <p style="font-size:12px;color:var(--text-muted);">প্রতিদিন সর্বোচ্চ ২০টি ভিডিও দেখা যাবে</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-client.js"></script>
+  <script src="app.js"></script>
+  <script>
+    const tg = window.Telegram?.WebApp;
+    const VIDEO_REWARD = 30; // 30 TK per video
+    const DAILY_LIMIT = 20;   // 20 videos per day
+    const COUNTDOWN_SECONDS = 30;
+    const ADSGRAM_BLOCK_ID = '29502';
+    const CIRCUMFERENCE = 502;
+    
+    let countdownInterval = null;
+    let adOpened = false;
+    let adsgramController = null;
+
+    if (tg) {
+      tg.ready();
+      tg.expand();
+    }
+
+    // Daily reset check
+    function checkDailyVideoReset() {
+      const today = new Date().toDateString();
+      const lastDate = localStorage.getItem('last_video_reset_date');
+      if (lastDate !== today) {
+        localStorage.setItem('daily_videos_watched', '0');
+        localStorage.setItem('last_video_reset_date', today);
+      }
+    }
+
+    function getDailyVideoCount() {
+      checkDailyVideoReset();
+      return parseInt(localStorage.getItem('daily_videos_watched') || '0');
+    }
+
+    function getTimeUntilTomorrow() {
+      const now = new Date();
+      const tomorrow = new Date(now);
+      tomorrow.setDate(now.getDate() + 1);
+      tomorrow.setHours(0, 0, 0, 0);
+      const diff = tomorrow - now;
+      const hours = Math.floor(diff / 3600000);
+      const mins = Math.floor((diff % 3600000) / 60000);
+      return `${hours}ঘ ${mins}মি`;
+    }
+
+    function updatePageUI() {
+      checkDailyVideoReset();
+      const count = getDailyVideoCount();
+      const remaining = DAILY_LIMIT - count;
+      const earned = count * VIDEO_REWARD;
+      
+      document.getElementById('videoCounter').textContent = count;
+      document.getElementById('videoProgressFill').style.width = `${(count / DAILY_LIMIT) * 100}%`;
+      document.getElementById('earnedToday').textContent = earned;
+      document.getElementById('resetTimer').textContent = `পরবর্তী রিসেট: ${getTimeUntilTomorrow()}`;
+      
+      const btn = document.getElementById('watchBtn');
+      if (count >= DAILY_LIMIT) {
+        btn.disabled = true;
+        btn.innerHTML = '❌ আজকের লিমিট শেষ! কাল আবার আসুন';
+        btn.style.opacity = '0.5';
+        btn.style.cursor = 'not-allowed';
+      } else {
+        btn.disabled = false;
+        btn.innerHTML = '🎥 ভিডিও দেখুন — ৩০ ৳ আয় করুন';
+        btn.style.opacity = '1';
+        btn.style.cursor = 'pointer';
+      }
+    }
+
+    function startCountdown() {
+      document.getElementById('countdownOverlay').style.display = 'flex';
+      let seconds = COUNTDOWN_SECONDS;
+      const numEl = document.getElementById('countdownNumber');
+      const circEl = document.getElementById('countdownCircle');
+      const statusEl = document.getElementById('countdownStatus');
+      
+      numEl.textContent = seconds;
+      circEl.style.strokeDashoffset = '0';
+      statusEl.textContent = 'ভিডিও দেখুন... ৩০ সেকেন্ড অপেক্ষা করুন';
+
+      if (countdownInterval) clearInterval(countdownInterval);
+      
+      countdownInterval = setInterval(() => {
+        seconds--;
+        numEl.textContent = seconds;
+        circEl.style.strokeDashoffset = ((COUNTDOWN_SECONDS - seconds) / COUNTDOWN_SECONDS) * CIRCUMFERENCE;
+        statusEl.textContent = `অপেক্ষা করুন... ${seconds} সেকেন্ড বাকি`;
+        
+        if (seconds <= 0) {
+          clearInterval(countdownInterval);
+          countdownInterval = null;
+          finishVideoAd();
+        }
+      }, 1000);
+    }
+
+    async function finishVideoAd() {
+      document.getElementById('countdownOverlay').style.display = 'none';
+      
+      // Increment daily count
+      const currentCount = getDailyVideoCount();
+      localStorage.setItem('daily_videos_watched', (currentCount + 1).toString());
+      
+      // Add earning using app.js function (creates a custom earning type)
+      const user = window.getCurrentUser ? window.getCurrentUser() : null;
+      if (user) {
+        user.balance = Number(user.balance || 0) + VIDEO_REWARD;
+        user.total_income = Number(user.total_income || 0) + VIDEO_REWARD;
+        
+        localStorage.setItem(`deshi_user_${user.id}`, JSON.stringify({
+          data: user,
+          timestamp: Date.now()
+        }));
+        
+        // Update in Supabase
+        try {
+          await window.supabase
+            .from('users')
+            .update({
+              balance: user.balance,
+              total_income: user.total_income,
+              last_active: new Date().toISOString()
+            })
+            .eq('id', user.id);
+          
+          // Log the ad watch
+          await window.logAdWatch(user.id, 'video_adsgram', VIDEO_REWARD);
+        } catch (e) {
+          console.error('Video earn DB update failed:', e);
+        }
+      }
+      
+      window.updateUI ? window.updateUI() : null;
+      updatePageUI();
+      
+      const newCount = getDailyVideoCount();
+      const msg = `✅ ${VIDEO_REWARD} টাকা যোগ হয়েছে! আজ ${newCount}/${DAILY_LIMIT} ভিডিও দেখা হয়েছে।`;
+      if (tg) tg.showAlert(msg); else alert(msg);
+      
+      adOpened = false;
+    }
+
+    async function watchVideoAd() {
+      const user = window.getCurrentUser ? window.getCurrentUser() : null;
+      if (!user) {
+        const msg = 'ডেটা লোড হয়নি! পেজ রিফ্রেশ করুন।';
+        if (tg) tg.showAlert(msg); else alert(msg);
+        return;
+      }
+      
+      checkDailyVideoReset();
+      const count = getDailyVideoCount();
+      
+      if (count >= DAILY_LIMIT) {
+        const msg = 'আজকের লিমিট শেষ! কাল আবার আসুন।';
+        if (tg) tg.showAlert(msg); else alert(msg);
+        return;
+      }
+      
+      if (adOpened) {
+        const msg = 'একটি ভিডিও ইতিমধ্যে চলছে!';
+        if (tg) tg.showAlert(msg); else alert(msg);
+        return;
+      }
+
+      const btn = document.getElementById('watchBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ভিডিও লোড হচ্ছে...';
+
+      // Initialize Adsgram
+      try {
+        if (window.AdSgram) {
+          adsgramController = window.AdSgram.init({
+            blockId: ADSGRAM_BLOCK_ID,
+            user_id: user.id,
+            user_name: user.first_name || 'User',
+            onReward: () => {
+              console.log('✅ Adsgram reward received');
+              // Reward callback - countdown starts after video completes
+            },
+            onError: (error) => {
+              console.error('Adsgram error:', error);
+              btn.disabled = false;
+              btn.innerHTML = '🎥 ভিডিও দেখুন — ৩০ ৳ আয় করুন';
+              adOpened = false;
+              const msg = 'ভিডিও লোড করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।';
+              if (tg) tg.showAlert(msg); else alert(msg);
+            },
+            onClose: () => {
+              console.log('Adsgram ad closed - starting countdown');
+              // Start 30-second countdown after video closes
+              adOpened = true;
+              startCountdown();
+            }
+          });
+          
+          adsgramController.show();
+        } else {
+          // Fallback if Adsgram SDK not loaded
+          console.warn('Adsgram SDK not loaded, using fallback');
+          adOpened = true;
+          startCountdown();
+        }
+      } catch (e) {
+        console.error('Adsgram init error:', e);
+        // Fallback
+        adOpened = true;
+        startCountdown();
+      }
+    }
+
+    // Expose to window
+    window.watchVideoAd = watchVideoAd;
+    window.updatePageUI = updatePageUI;
+
+    // Wait for user data then update UI
+    let attempts = 0;
+    function waitForUser() {
+      const user = window.getCurrentUser ? window.getCurrentUser() : null;
+      if (user && user.id) {
+        updatePageUI();
+      } else if (attempts < 30) {
+        attempts++;
+        setTimeout(waitForUser, 200);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      waitForUser();
+      setInterval(updatePageUI, 30000);
+      
+      // Handle user coming back after watching video
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && adOpened) {
+          // User came back, countdown should already be running
+          console.log('User returned to page');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
