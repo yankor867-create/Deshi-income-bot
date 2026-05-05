@@ -4,11 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>ভিডিও দেখুন | দেশী ইনকাম</title>
+  
+  <!-- Adsgram SDK in HEAD tag as required -->
+  <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+  
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
 </head>
 <body class="min-h-screen pb-24">
 
@@ -113,8 +116,6 @@
     </div>
   </div>
 
-  <!-- Adsgram SDK -->
-  <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
   <script src="config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-client.js"></script>
@@ -129,6 +130,7 @@
     
     let countdownInterval = null;
     let adOpened = false;
+    let AdController = null;
 
     if (tg) {
       tg.ready();
@@ -159,6 +161,27 @@
       const hours = Math.floor(diff / 3600000);
       const mins = Math.floor((diff % 3600000) / 60000);
       return `${hours}ঘ ${mins}মি`;
+    }
+
+    // ========== INIT ADSGRAM CONTROLLER ==========
+    function initAdsgram() {
+      if (AdController) return true;
+      
+      try {
+        // Check if Adsgram SDK is loaded
+        if (typeof window.Adsgram === 'undefined') {
+          console.error('❌ window.Adsgram is not available');
+          return false;
+        }
+        
+        // Initialize the controller with block ID
+        AdController = window.Adsgram.init({ blockId: ADSGRAM_BLOCK_ID });
+        console.log('✅ Adsgram controller initialized with block ID:', ADSGRAM_BLOCK_ID);
+        return true;
+      } catch (e) {
+        console.error('❌ Adsgram init error:', e);
+        return false;
+      }
     }
 
     // ========== UI UPDATE ==========
@@ -214,7 +237,7 @@
       }, 1000);
     }
 
-    // ========== FINISH & CREDIT ==========
+    // ========== FINISH & CREDIT REWARD ==========
     async function finishVideoAd() {
       document.getElementById('countdownOverlay').style.display = 'none';
       
@@ -222,10 +245,9 @@
       const currentCount = getDailyVideoCount();
       localStorage.setItem('daily_videos_watched', (currentCount + 1).toString());
       
-      // Add earning using addBonus from app.js
+      // Credit the reward using addBonus from app.js
       const user = window.getCurrentUser ? window.getCurrentUser() : null;
       if (user) {
-        // Use addBonus instead of manual update for consistency
         if (typeof window.addBonus === 'function') {
           await window.addBonus(VIDEO_REWARD);
         } else {
@@ -293,7 +315,7 @@
       }
       
       if (adOpened) {
-        const msg = 'একটি ভিডিও ইতিমধ্যে চলছে! দয়া করে কাউন্টডাউন শেষ হওয়ার জন্য অপেক্ষা করুন।';
+        const msg = 'একটি ভিডিও ইতিমধ্যে চলছে! দয়া করে অপেক্ষা করুন।';
         if (tg) tg.showAlert(msg); else alert(msg);
         return;
       }
@@ -302,55 +324,56 @@
       btn.disabled = true;
       btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ভিডিও লোড হচ্ছে...';
 
-      adOpened = true;
-
-      try {
-        // Check if Adsgram SDK is loaded
-        if (typeof AdSgram !== 'undefined') {
-          console.log('✅ Adsgram SDK found, initializing...');
-          
-          // Initialize Adsgram with block ID
-          const controller = AdSgram.init({
-            blockId: ADSGRAM_BLOCK_ID
-          });
-
-          // Show the ad
-          controller.show()
-            .then((result) => {
-              console.log('✅ Adsgram show() resolved:', result);
-              // Ad completed successfully
-              startCountdown();
-            })
-            .catch((error) => {
-              console.error('❌ Adsgram show() failed:', error);
-              btn.disabled = false;
-              btn.innerHTML = '🎥 ভিডিও দেখুন — ৩০ ৳ আয় করুন';
-              adOpened = false;
-              
-              // Fallback: start countdown directly if ad fails
-              const msg = 'ভিডিও লোড করতে সমস্যা হয়েছে। কাউন্টডাউন শুরু হচ্ছে...';
-              if (tg) tg.showAlert(msg); 
-              startCountdown();
-            })
-            .finally(() => {
-              console.log('🔄 Adsgram show() finished');
-            });
-
-        } else {
-          // Adsgram SDK not available, use fallback
-          console.warn('⚠️ Adsgram SDK not loaded, using fallback countdown');
-          if (tg) tg.showAlert('⚠️ Adsgram SDK সঠিকভাবে লোড হয়নি। ফ্যালব্যাক মোডে চলছে।');
-          startCountdown();
-        }
-      } catch (e) {
-        console.error('❌ Adsgram error:', e);
-        btn.disabled = false;
-        btn.innerHTML = '🎥 ভিডিও দেখুন — ৩০ ৳ আয় করুন';
-        adOpened = false;
-        
-        const msg = '❌ কিছু সমস্যা হয়েছে: ' + e.message;
-        if (tg) tg.showAlert(msg); else alert(msg);
+      // Initialize Adsgram controller if not already done
+      const isInitialized = initAdsgram();
+      
+      if (!isInitialized) {
+        console.warn('⚠️ Adsgram SDK not available, using fallback');
+        if (tg) tg.showAlert('⚠️ Adsgram লোড হয়নি। ফ্যালব্যাক মোডে চলছে।');
+        adOpened = true;
+        startCountdown();
+        return;
       }
+
+      // Show the rewarded ad using Adsgram
+      AdController.show()
+        .then((result) => {
+          console.log('✅ Adsgram show() resolved:', result);
+          
+          // result.done = true means user watched till the end
+          // result.error = false means no error occurred
+          if (result.done && !result.error) {
+            console.log('✅ User watched ad till the end, starting countdown');
+            adOpened = true;
+            startCountdown();
+          } else {
+            console.warn('⚠️ Ad was not completed:', result);
+            btn.disabled = false;
+            btn.innerHTML = '🎥 ভিডিও দেখুন — ৩০ ৳ আয় করুন';
+            adOpened = false;
+            
+            const msg = 'ভিডিও সম্পূর্ণ দেখা হয়নি। আবার চেষ্টা করুন।';
+            if (tg) tg.showAlert(msg); else alert(msg);
+          }
+        })
+        .catch((error) => {
+          console.error('❌ Adsgram show() failed:', error);
+          btn.disabled = false;
+          btn.innerHTML = '🎥 ভিডিও দেখুন — ৩০ ৳ আয় করুন';
+          adOpened = false;
+          
+          // Check if it's a user skip or error
+          if (error && error.error) {
+            const msg = '❌ ভিডিও দেখানো সম্ভব হয়নি। আবার চেষ্টা করুন।';
+            if (tg) tg.showAlert(msg); else alert(msg);
+          } else {
+            const msg = '⚠️ ভিডিও স্কিপ করা হয়েছে। আবার চেষ্টা করুন।';
+            if (tg) tg.showAlert(msg); else alert(msg);
+          }
+        })
+        .finally(() => {
+          console.log('🔄 Adsgram show() finished');
+        });
     }
 
     // ========== EXPOSE FUNCTIONS ==========
@@ -359,43 +382,49 @@
 
     // ========== INITIALIZE ==========
     let attempts = 0;
-    function waitForUser() {
+    function waitForUserAndInit() {
       const user = window.getCurrentUser ? window.getCurrentUser() : null;
       if (user && user.id) {
         updatePageUI();
         console.log('✅ User loaded for video earn page:', user.id);
-        console.log('Adsgram Block ID:', ADSGRAM_BLOCK_ID);
-        console.log('Adsgram SDK available:', typeof AdSgram !== 'undefined' ? 'Yes ✅' : 'No ❌');
+        
+        // Try to initialize Adsgram
+        setTimeout(() => {
+          const initialized = initAdsgram();
+          console.log('Adsgram initialization:', initialized ? 'Successful ✅' : 'Failed ❌');
+          console.log('Adsgram SDK available:', typeof window.Adsgram !== 'undefined' ? 'Yes ✅' : 'No ❌');
+          console.log('Block ID:', ADSGRAM_BLOCK_ID);
+        }, 1000);
+        
       } else if (attempts < 30) {
         attempts++;
-        setTimeout(waitForUser, 200);
+        console.log(`Waiting for user data... attempt ${attempts}/30`);
+        setTimeout(waitForUserAndInit, 200);
       } else {
         console.warn('⚠️ User data not loaded after 30 attempts');
-        updatePageUI(); // Update UI anyway with localStorage data
+        updatePageUI();
+        
+        // Still try to initialize Adsgram
+        setTimeout(() => initAdsgram(), 1000);
       }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
       console.log('📄 Video earn page loaded');
-      waitForUser();
+      console.log('Block ID:', ADSGRAM_BLOCK_ID);
+      console.log('Reward:', VIDEO_REWARD, 'TK');
+      console.log('Daily Limit:', DAILY_LIMIT);
+      
+      waitForUserAndInit();
       setInterval(updatePageUI, 30000);
       
-      // Handle page visibility change (user comes back after ad)
+      // Handle page visibility change
       document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') {
           console.log('👁️ User returned to video earn page');
           updatePageUI();
         }
       });
-
-      // Check if Adsgram loaded properly
-      setTimeout(() => {
-        if (typeof AdSgram === 'undefined') {
-          console.error('❌ AdSgram still not available after 3 seconds');
-        } else {
-          console.log('✅ AdSgram confirmed loaded');
-        }
-      }, 3000);
     });
   </script>
 </body>
