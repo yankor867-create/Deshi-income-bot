@@ -48,8 +48,8 @@
     }
     
     .timer-btn.counting {
-      background: linear-gradient(135deg, #1E40AF, #1D4ED8);
-      box-shadow: 0 8px 24px rgba(30,64,175,0.4);
+      background: linear-gradient(135deg, #059669, #10B981);
+      box-shadow: 0 8px 24px rgba(5,150,105,0.4);
     }
     
     .timer-btn .timer-text {
@@ -102,26 +102,74 @@
     
     /* Info alert box */
     .info-alert {
-      background: rgba(59,130,246,0.08);
-      border: 1px solid rgba(59,130,246,0.2);
+      background: rgba(34,197,94,0.08);
+      border: 1px solid rgba(34,197,94,0.2);
       border-radius: 14px;
       padding: 12px 16px;
       margin-top: 12px;
       display: flex;
       align-items: center;
       gap: 10px;
+      transition: all 0.3s;
+    }
+    
+    .info-alert.alert-blue {
+      background: rgba(59,130,246,0.08);
+      border: 1px solid rgba(59,130,246,0.2);
+    }
+    
+    .info-alert.alert-green {
+      background: rgba(34,197,94,0.08);
+      border: 1px solid rgba(34,197,94,0.2);
+    }
+    
+    .info-alert.alert-counting {
+      background: rgba(245,158,11,0.08);
+      border: 1px solid rgba(245,158,11,0.2);
     }
     
     .info-alert i {
-      color: #3B82F6;
       font-size: 18px;
       flex-shrink: 0;
     }
+    
+    .info-alert.alert-blue i { color: #3B82F6; }
+    .info-alert.alert-green i { color: #22C55E; }
+    .info-alert.alert-counting i { color: #F59E0B; }
     
     .info-alert p {
       font-size: 12px;
       color: var(--text-muted);
       margin: 0;
+    }
+    
+    /* Success overlay flash */
+    .success-flash {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: rgba(34,197,94,0.95);
+      color: #fff;
+      padding: 20px 32px;
+      border-radius: 20px;
+      font-size: 18px;
+      font-weight: 700;
+      z-index: 9999;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(34,197,94,0.5);
+      pointer-events: none;
+      animation: flashIn 0.5s ease forwards, flashOut 0.5s ease 1.5s forwards;
+    }
+    
+    @keyframes flashIn {
+      0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+      100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    }
+    
+    @keyframes flashOut {
+      0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+      100% { transform: translate(-50%, -50%) scale(1.2); opacity: 0; }
     }
   </style>
 </head>
@@ -180,9 +228,9 @@
     </div>
 
     <!-- Info Alert -->
-    <div class="info-alert fade-up fade-up-4" id="infoAlert">
+    <div class="info-alert alert-blue fade-up fade-up-4" id="infoAlert">
       <i class="fas fa-info-circle"></i>
-      <p>ভিডিও দেখার পর <strong style="color:#3B82F6;">৩০ সেকেন্ড</strong> অপেক্ষা করতে হবে। টাইমার শেষ হলে টাকা যোগ হবে।</p>
+      <p>ভিডিও দেখার সাথে সাথেই <strong style="color:#22C55E;">৩০ টাকা</strong> যোগ হবে। তারপর ৩০ সেকেন্ড অপেক্ষা করুন।</p>
     </div>
 
     <!-- টাস্ক পেজে ফিরে যান -->
@@ -203,12 +251,12 @@
           <p style="font-size:12px;color:var(--text-muted);">"ভিডিও দেখুন" বাটনে ক্লিক করুন</p>
         </div>
         <div style="display:flex;gap:8px;align-items:flex-start;">
-          <span style="color:#3B82F6;font-size:12px;margin-top:1px;">✓</span>
-          <p style="font-size:12px;color:var(--text-muted);">ভিডিও সম্পূর্ণ দেখুন (Adsgram)</p>
+          <span style="color:#22C55E;font-size:12px;margin-top:1px;">💰</span>
+          <p style="font-size:12px;color:var(--text-muted);"><strong style="color:#22C55E;">ভিডিও শেষ হলে সাথে সাথে ৩০ টাকা পেয়ে যাবেন</strong></p>
         </div>
         <div style="display:flex;gap:8px;align-items:flex-start;">
-          <span style="color:#3B82F6;font-size:12px;margin-top:1px;">✓</span>
-          <p style="font-size:12px;color:var(--text-muted);">বাটনে ৩০ সেকেন্ড টাইমার শেষ হলে টাকা যোগ হবে</p>
+          <span style="color:#F59E0B;font-size:12px;margin-top:1px;">⏳</span>
+          <p style="font-size:12px;color:var(--text-muted);">তারপর ৩০ সেকেন্ড টাইমার চলবে (পরবর্তী ভিডিওর জন্য অপেক্ষা)</p>
         </div>
         <div style="display:flex;gap:8px;align-items:flex-start;">
           <span style="color:#3B82F6;font-size:12px;margin-top:1px;">✓</span>
@@ -283,6 +331,18 @@
       }
     }
 
+    // ========== SHOW SUCCESS FLASH ==========
+    function showSuccessFlash() {
+      const flash = document.createElement('div');
+      flash.className = 'success-flash';
+      flash.innerHTML = '💰 ৩০ টাকা যোগ হয়েছে!<br><small style="font-size:12px;opacity:0.8;">এখন ৩০ সেকেন্ড অপেক্ষা করুন</small>';
+      document.body.appendChild(flash);
+      
+      setTimeout(() => {
+        if (flash.parentNode) flash.parentNode.removeChild(flash);
+      }, 2000);
+    }
+
     // ========== UI UPDATE ==========
     function updatePageUI() {
       checkDailyVideoReset();
@@ -297,6 +357,7 @@
       const btn = document.getElementById('watchBtn');
       const timerText = document.getElementById('timerText');
       const timerProgress = document.getElementById('timerProgress');
+      const infoAlert = document.getElementById('infoAlert');
       
       // Only update if not in countdown
       if (adOpened) return;
@@ -307,6 +368,12 @@
         timerText.innerHTML = '❌ আজকের লিমিট শেষ! কাল আবার আসুন';
         timerProgress.style.width = '0%';
         btn.style.opacity = '0.6';
+        
+        infoAlert.className = 'info-alert alert-blue';
+        infoAlert.innerHTML = `
+          <i class="fas fa-info-circle"></i>
+          <p>আজকের <strong style="color:#3B82F6;">২০টি ভিডিওর</strong> লিমিট শেষ হয়ে গেছে। কাল আবার আসুন।</p>
+        `;
       } else {
         btn.disabled = false;
         btn.classList.remove('counting');
@@ -314,60 +381,17 @@
         timerText.innerHTML = '🎥 ভিডিও দেখুন — ৩০ ৳ আয় করুন';
         timerProgress.style.width = '0%';
         btn.style.opacity = '1';
+        
+        infoAlert.className = 'info-alert alert-blue';
+        infoAlert.innerHTML = `
+          <i class="fas fa-info-circle"></i>
+          <p>ভিডিও দেখার সাথে সাথেই <strong style="color:#22C55E;">৩০ টাকা</strong> যোগ হবে। তারপর ৩০ সেকেন্ড অপেক্ষা করুন।</p>
+        `;
       }
     }
 
-    // ========== START BUTTON COUNTDOWN ==========
-    function startButtonCountdown() {
-      const btn = document.getElementById('watchBtn');
-      const timerText = document.getElementById('timerText');
-      const timerProgress = document.getElementById('timerProgress');
-      const infoAlert = document.getElementById('infoAlert');
-      
-      btn.disabled = true;
-      btn.classList.add('counting');
-      btn.classList.remove('success-pulse');
-      
-      let seconds = COUNTDOWN_SECONDS;
-      
-      // Update info alert
-      infoAlert.innerHTML = `
-        <i class="fas fa-spinner fa-spin" style="color:#3B82F6;font-size:18px;flex-shrink:0;"></i>
-        <p>টাইমার চলছে... <strong style="color:#3B82F6;">${seconds} সেকেন্ড</strong> অপেক্ষা করুন। টাইমার শেষ না হওয়া পর্যন্ত পেজ বন্ধ করবেন না।</p>
-      `;
-      
-      // Initial button state
-      timerText.innerHTML = `⏳ অপেক্ষা করুন <span class="timer-count">${seconds}</span> সেকেন্ড`;
-      timerProgress.style.width = '0%';
-      
-      if (countdownInterval) clearInterval(countdownInterval);
-      
-      countdownInterval = setInterval(() => {
-        seconds--;
-        timerText.innerHTML = `⏳ অপেক্ষা করুন <span class="timer-count">${seconds}</span> সেকেন্ড`;
-        timerProgress.style.width = `${((COUNTDOWN_SECONDS - seconds) / COUNTDOWN_SECONDS) * 100}%`;
-        
-        // Update info alert countdown
-        infoAlert.innerHTML = `
-          <i class="fas fa-spinner fa-spin" style="color:#3B82F6;font-size:18px;flex-shrink:0;"></i>
-          <p>টাইমার চলছে... <strong style="color:#3B82F6;">${seconds} সেকেন্ড</strong> অপেক্ষা করুন। টাইমার শেষ না হওয়া পর্যন্ত পেজ বন্ধ করবেন না।</p>
-        `;
-        
-        if (seconds <= 0) {
-          clearInterval(countdownInterval);
-          countdownInterval = null;
-          finishVideoAd();
-        }
-      }, 1000);
-    }
-
-    // ========== FINISH & CREDIT REWARD ==========
-    async function finishVideoAd() {
-      const btn = document.getElementById('watchBtn');
-      const timerText = document.getElementById('timerText');
-      const timerProgress = document.getElementById('timerProgress');
-      const infoAlert = document.getElementById('infoAlert');
-      
+    // ========== CREDIT REWARD IMMEDIATELY ==========
+    async function creditReward() {
       // Increment daily count
       const currentCount = getDailyVideoCount();
       localStorage.setItem('daily_videos_watched', (currentCount + 1).toString());
@@ -413,42 +437,93 @@
         window.updateUI();
       }
       
-      // Show success state on button
+      updatePageUI();
+      
+      // Show success flash
+      showSuccessFlash();
+      
+      console.log('✅ Reward credited:', VIDEO_REWARD, 'TK');
+    }
+
+    // ========== START BUTTON COUNTDOWN (AFTER REWARD) ==========
+    function startButtonCountdown() {
+      const btn = document.getElementById('watchBtn');
+      const timerText = document.getElementById('timerText');
+      const timerProgress = document.getElementById('timerProgress');
+      const infoAlert = document.getElementById('infoAlert');
+      
+      btn.disabled = true;
+      btn.classList.add('counting');
+      btn.classList.remove('success-pulse');
+      
+      let seconds = COUNTDOWN_SECONDS;
+      
+      // Update info alert to counting state
+      infoAlert.className = 'info-alert alert-counting';
+      infoAlert.innerHTML = `
+        <i class="fas fa-clock" style="color:#F59E0B;"></i>
+        <p><strong style="color:#22C55E;">✅ ৩০ টাকা যোগ হয়েছে!</strong> পরবর্তী ভিডিওর জন্য <strong style="color:#F59E0B;">${seconds} সেকেন্ড</strong> অপেক্ষা করুন...</p>
+      `;
+      
+      // Update button to show countdown
+      timerText.innerHTML = `⏳ পরবর্তী ভিডিও <span class="timer-count">${seconds}</span> সেকেন্ড`;
+      timerProgress.style.width = '0%';
+      
+      if (countdownInterval) clearInterval(countdownInterval);
+      
+      countdownInterval = setInterval(() => {
+        seconds--;
+        timerText.innerHTML = `⏳ পরবর্তী ভিডিও <span class="timer-count">${seconds}</span> সেকেন্ড`;
+        timerProgress.style.width = `${((COUNTDOWN_SECONDS - seconds) / COUNTDOWN_SECONDS) * 100}%`;
+        
+        // Update info alert countdown
+        infoAlert.innerHTML = `
+          <i class="fas fa-clock" style="color:#F59E0B;"></i>
+          <p><strong style="color:#22C55E;">✅ ৩০ টাকা যোগ হয়েছে!</strong> পরবর্তী ভিডিওর জন্য <strong style="color:#F59E0B;">${seconds} সেকেন্ড</strong> অপেক্ষা করুন...</p>
+        `;
+        
+        if (seconds <= 0) {
+          clearInterval(countdownInterval);
+          countdownInterval = null;
+          finishCountdown();
+        }
+      }, 1000);
+    }
+
+    // ========== FINISH COUNTDOWN ==========
+    function finishCountdown() {
+      const btn = document.getElementById('watchBtn');
+      const timerText = document.getElementById('timerText');
+      const timerProgress = document.getElementById('timerProgress');
+      const infoAlert = document.getElementById('infoAlert');
+      
+      adOpened = false;
+      
       btn.classList.remove('counting');
       btn.classList.add('success-pulse');
-      timerText.innerHTML = '✅ ৩০ টাকা যোগ হয়েছে!';
+      timerText.innerHTML = '✅ প্রস্তুত! আবার ভিডিও দেখুন';
       timerProgress.style.width = '100%';
       timerProgress.style.background = 'rgba(34,197,94,0.5)';
       
       // Update info alert
-      const newCount = getDailyVideoCount();
+      infoAlert.className = 'info-alert alert-green';
       infoAlert.innerHTML = `
-        <i class="fas fa-check-circle" style="color:#22C55E;font-size:18px;flex-shrink:0;"></i>
-        <p><strong style="color:#22C55E;">✅ সফল!</strong> ৩০ টাকা যোগ হয়েছে। আজ ${newCount}/${DAILY_LIMIT} ভিডিও দেখা হয়েছে।</p>
+        <i class="fas fa-check-circle" style="color:#22C55E;"></i>
+        <p><strong style="color:#22C55E;">✅ প্রস্তুত!</strong> আপনি আবার ভিডিও দেখতে পারবেন।</p>
       `;
       
       // Reset button after 2 seconds
       setTimeout(() => {
-        adOpened = false;
         timerProgress.style.background = 'rgba(255,255,255,0.4)';
         updatePageUI();
-        
-        // Reset info alert
-        infoAlert.innerHTML = `
-          <i class="fas fa-info-circle"></i>
-          <p>ভিডিও দেখার পর <strong style="color:#3B82F6;">৩০ সেকেন্ড</strong> অপেক্ষা করতে হবে। টাইমার শেষ হলে টাকা যোগ হবে।</p>
-        `;
       }, 2000);
-      
-      const msg = `✅ ${VIDEO_REWARD} টাকা যোগ হয়েছে!`;
-      if (tg) tg.showAlert(msg);
     }
 
     // ========== MAIN: WATCH VIDEO AD ==========
     async function watchVideoAd() {
       const user = window.getCurrentUser ? window.getCurrentUser() : null;
       if (!user) {
-        if (tg) tg.showAlert('ডেটা লোড হয়নি! পেজ রিফ্রেশ করুন。');
+        if (tg) tg.showAlert('ডেটা লোড হয়নি! পেজ রিফ্রেশ করুন।');
         return;
       }
       
@@ -477,21 +552,28 @@
       if (!isInitialized) {
         console.warn('⚠️ Adsgram not available, using fallback');
         adOpened = true;
+        // Credit reward first
+        await creditReward();
+        // Then start countdown
         startButtonCountdown();
         return;
       }
 
       // Show Adsgram ad
       AdController.show()
-        .then((result) => {
+        .then(async (result) => {
           console.log('✅ Adsgram result:', result);
           
           if (result.done && !result.error) {
-            // User watched full ad, start button countdown
+            // User watched full ad
+            // STEP 1: Credit reward immediately
             adOpened = true;
+            await creditReward();
+            
+            // STEP 2: Start 30-second countdown
             startButtonCountdown();
           } else {
-            // Ad not completed
+            // Ad not completed, no reward
             btn.disabled = false;
             btn.classList.remove('counting');
             timerText.innerHTML = '🎥 ভিডিও দেখুন — ৩০ ৳ আয় করুন';
@@ -499,13 +581,13 @@
             if (tg) tg.showAlert('ভিডিও সম্পূর্ণ দেখা হয়নি। আবার চেষ্টা করুন।');
           }
         })
-        .catch((error) => {
+        .catch(async (error) => {
           console.error('❌ Adsgram error:', error);
-          btn.disabled = false;
-          btn.classList.remove('counting');
-          timerText.innerHTML = '🎥 ভিডিও দেখুন — ৩০ ৳ আয় করুন';
           
-          if (tg) tg.showAlert('❌ ভিডিও দেখানো সম্ভব হয়নি। আবার চেষ্টা করুন।');
+          // Fallback: credit reward anyway then countdown
+          adOpened = true;
+          await creditReward();
+          startButtonCountdown();
         });
     }
 
