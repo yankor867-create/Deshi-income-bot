@@ -8,23 +8,12 @@ window.CONFIG = {
     APP_URL: 'https://deshi-income-bot.vercel.app/',   // ← change this to your Vercel URL!
     AD_LINKS: [
          'https://crn77.com/4/9550427',
-        'https://techbazar555.netlify.app/',
-        'https://omg10.com/4/10095617',
         'https://shingledirt.com/img7n81xh8?key=60effca0c228e66afd204784027d8b16',
         'https://omg10.com/4/9345167',
         'https://shingledirt.com/img7n81xh8?key=60effca0c228e66afd204784027d8b16',
-        'https://crn77.com/4/9550427',
-        'https://omg10.com/4/10095617',
-        'https://crn77.com/4/10095617',
-        'https://omg10.com/4/9475514',
-        'https://crn77.com/4/9550427',
-        'https://crn77.com/4/9550427',
         'https://shingledirt.com/img7n81xh8?key=60effca0c228e66afd204784027d8b16',
-        'https://shingledirt.com/img7n81xh8?key=60effca0c228e66afd204784027d8b16',
-        'https://crn77.com/4/10095617',
-        'https://crn77.com/4/10095617',
-        'https://crn77.com/4/10095617',
-        'https://crn77.com/4/10095617'
+        'https://shingledirt.com/img7n81xh8?key=60effca0c228e66afd204784027d8b16'
+       
     ],
     AD_REWARD: 10,
     BONUS_AD_REWARD: 5,
