@@ -4,7 +4,6 @@ window.CONFIG = {
     SUPABASE_URL: 'https://fqeohejqrpcwjrjvamth.supabase.co',
     SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxZW9oZWpxcnBjd2pyanZhbXRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwNDMxMjYsImV4cCI6MjA5MjYxOTEyNn0.DVuwgugcetNytGV7lKezN9EF5UCuaNaEmyy7PVgGm6Q',
     BOT_USERNAME: 'deshiincomebot',
-    BOT_TOKEN: '8763377927:AAE43INuRksUN1HSImP6HcsF4Q47M8sw6Y8',
     APP_URL: 'https://deshi-income-bot.vercel.app/',
     AD_LINKS: [
         'https://crn77.com/4/9550427',
