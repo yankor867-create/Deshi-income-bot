@@ -140,6 +140,38 @@
         <span class="badge" style="background:rgba(59,130,246,0.1);color:#3B82F6;border-color:rgba(59,130,246,0.25);">৩০ ৳ / ভিডিও</span>
       </div>
 
+        <!-- VIDEO TASK CARD -->
+        <div class="task-card p-5 mb-4 fade-up fade-up-3" style="background: linear-gradient(135deg, #1e3c72, #2b4c7c); border: none;">
+            <div class="flex justify-between items-center mb-4">
+                <div class="flex items-center gap-3">
+                    <div style="width:44px;height:44px;background:rgba(255,0,0,0.2);border-radius:14px;display:flex;align-items:center;justify-content:center;">
+                        <i class="fab fa-youtube text-red-400 text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 style="font-size:15px;font-weight:700;color:var(--text-primary);">ভিডিও টাস্ক</h3>
+                        <p style="font-size:11px;color:var(--text-muted);">৮ মিনিট ভিডিও দেখে আয় করুন</p>
+                    </div>
+                </div>
+                <span class="badge" style="background:rgba(255,0,0,0.2);color:#FF5555;border-color:rgba(255,0,0,0.3);">১০০ ৳ / ভিডিও</span>
+            </div>
+
+            <div class="mb-4">
+                <div class="flex justify-between mb-2">
+                    <span style="font-size:12px;color:var(--text-muted);">আজকে দেখা:</span>
+                    <span style="font-size:12px;font-weight:600;color:#FF5555;"><span id="taskVideoCount">0</span>/<span id="taskVideoLimit">2</span></span>
+                </div>
+                <div class="progress-track">
+                    <div id="taskVideoProgress" class="progress-fill" style="width:0%; background: linear-gradient(90deg, #FF0000, #FF5555);"></div>
+                </div>
+            </div>
+
+            <a href="video-task.html" style="text-decoration:none;display:block;">
+                <button class="w-full py-3 rounded-xl font-bold text-white" style="background: linear-gradient(135deg, #FF0000, #CC0000);">
+                    🎥 ভিডিও দেখে আয় করুন
+                </button>
+            </a>
+        </div>
+
       <div class="mb-4">
         <div class="flex justify-between mb-2">
           <span style="font-size:12px;color:var(--text-muted);">আজকের অগ্রগতি</span>
@@ -300,6 +332,31 @@
       if (localStorage.getItem('task_telegram')) { const b = document.getElementById('telegramBtn'); b.innerHTML = '✅ সম্পন্ন'; b.disabled = true; b.style.opacity='0.7'; }
       if (localStorage.getItem('task_youtube')) { const b = document.getElementById('youtubeBtn'); b.innerHTML = '✅ সম্পন্ন'; b.disabled = true; b.style.opacity='0.7'; }
     });
+
+    // Video task counter update
+    function getDailyVideoTaskCount() {
+        const today = new Date().toDateString();
+        const lastDate = localStorage.getItem('video_task_date');
+        if (lastDate !== today) {
+            return 0;
+        }
+        return parseInt(localStorage.getItem('video_task_count') || '0');
+    }
+    
+    function updateVideoTaskUI() {
+        const count = getDailyVideoTaskCount();
+        const limit = window.CONFIG.VIDEO_TASK?.DAILY_LIMIT || 2;
+        document.getElementById('taskVideoCount').textContent = count;
+        document.getElementById('taskVideoLimit').textContent = limit;
+        document.getElementById('taskVideoProgress').style.width = `${(count / limit) * 100}%`;
+    }
+    
+    // Add this to existing DOMContentLoaded
+    if (document.getElementById('taskVideoCount')) {
+        updateVideoTaskUI();
+        setInterval(updateVideoTaskUI, 30000);
+    }
+
   </script>
 </body>
 </html>

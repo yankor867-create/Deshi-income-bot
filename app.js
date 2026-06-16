@@ -1,6 +1,5 @@
-// app.js - দেশী ইনকাম (v2.0.3)
-// Fixed: refreshMyReferralCount updates balance + total income
-// Referral page uses no auto-refresh (handled in referral.html)
+// app.js - দেশী ইনকাম (v2.0.4)
+// Added: YouTube Video Task Feature
 
 let currentUser = null;
 let updateDebounce = null;
@@ -103,13 +102,11 @@ async function loadUser() {
     if (user) {
         currentUser = user;
         try {
-            // Refresh referral count on every load (also updates balance/income)
             await refreshMyReferralCount();
         } catch (e) {
             console.warn('Referral refresh failed:', e);
         }
     } else {
-        // Create new user (referred_by = null)
         const newUser = {
             id: userId,
             first_name: firstName,
@@ -133,7 +130,6 @@ async function loadUser() {
         }
         currentUser = user;
 
-        // Handle referral if exists
         if (referrerId && referrerId !== userId) {
             try {
                 const referralResult = await window.createReferralRecord(
@@ -143,7 +139,6 @@ async function loadUser() {
                     'telegram_startapp'
                 );
                 if (referralResult.success) {
-                    // Add referral bonus to new user
                     const newBalance = window.CONFIG.SIGNUP_BONUS + window.CONFIG.REFERRED_BONUS;
                     const { error } = await window.supabase
                         .from('users')
@@ -181,13 +176,11 @@ async function refreshMyReferralCount() {
     if (!currentUser) return 0;
     try {
         const result = await window.refreshReferralCount(currentUser.id);
-        // result is an object { total_referrals, balance, total_income }
         if (typeof result === 'object' && result !== null) {
             currentUser.total_referrals = result.total_referrals;
             currentUser.balance = result.balance;
             currentUser.total_income = result.total_income;
         } else {
-            // fallback if old implementation returns just number
             currentUser.total_referrals = result;
         }
         localStorage.setItem(`deshi_user_${currentUser.id}`, JSON.stringify({
@@ -351,6 +344,39 @@ async function addBonus(amount) {
             .eq('id', currentUser.id);
     } catch (e) {
         console.error('addBonus DB failed:', e);
+    }
+}
+
+// ========== YOUTUBE VIDEO TASK BONUS ==========
+async function addVideoTaskBonus() {
+    if (!currentUser) return { success: false, error: 'ইউজার লোড হয়নি' };
+    
+    const reward = window.CONFIG.VIDEO_TASK?.REWARD || 100;
+    
+    currentUser.balance = Number(currentUser.balance || 0) + reward;
+    currentUser.total_income = Number(currentUser.total_income || 0) + reward;
+    
+    localStorage.setItem(`deshi_user_${currentUser.id}`, JSON.stringify({
+        data: currentUser,
+        timestamp: Date.now()
+    }));
+    updateUI();
+    
+    try {
+        await window.supabase
+            .from('users')
+            .update({
+                balance: currentUser.balance,
+                total_income: currentUser.total_income,
+                last_active: new Date().toISOString()
+            })
+            .eq('id', currentUser.id);
+        
+        await window.logAdWatch(currentUser.id, 'youtube_video', reward);
+        return { success: true };
+    } catch (e) {
+        console.error('Video task bonus DB failed:', e);
+        return { success: false, error: e.message };
     }
 }
 
@@ -519,6 +545,7 @@ window.addEarning = addEarning;
 window.addBonusEarning = addBonusEarning;
 window.addDailyBonusEarning = addDailyBonusEarning;
 window.addBonus = addBonus;
+window.addVideoTaskBonus = addVideoTaskBonus;
 window.requestWithdraw = requestWithdraw;
 window.getCurrentUser = getCurrentUser;
 window.loadUser = loadUser;
@@ -550,7 +577,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     await loadUser();
 
-    // Periodic sync every 10 minutes (updates balance, income, referrals)
     setInterval(async () => {
         if (currentUser) {
             try {

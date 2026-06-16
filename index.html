@@ -99,7 +99,6 @@
       background: rgba(245,200,66,0.15);
       color: var(--gold);
     }
-    /* ===== EXTRA LARGE, FULL-WIDTH RULES BUTTON ===== */
     .rules-btn-massive {
       background: linear-gradient(115deg, #FFF5E0, #FFEFC0);
       border: none;
@@ -138,9 +137,122 @@
       background: linear-gradient(90deg, transparent, rgba(245,200,66,0.4), transparent);
       margin: 8px 0 16px;
     }
-    /* header action row - remove old small button */
     .action-header {
       margin-bottom: 8px;
+    }
+
+    /* ========== FLOATING YOUTUBE VIDEO BUTTON ========== */
+    .floating-video-btn {
+        position: fixed;
+        bottom: 110px;
+        right: 16px;
+        z-index: 45;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: linear-gradient(135deg, #FF416C, #FF4B2B);
+        color: white;
+        padding: 12px 18px;
+        border-radius: 50px;
+        font-weight: bold;
+        font-size: 14px;
+        cursor: pointer;
+        border: none;
+        box-shadow: 0 8px 25px rgba(255, 65, 108, 0.5);
+        animation: floatPulse 2s ease-in-out infinite;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+    .floating-video-btn:hover {
+        transform: translateY(-4px) scale(1.05);
+        box-shadow: 0 12px 30px rgba(255, 65, 108, 0.7);
+    }
+
+    .floating-video-btn:active {
+        transform: scale(0.95);
+    }
+
+    .floating-video-btn .icon-circle {
+        width: 42px;
+        height: 42px;
+        background: rgba(255, 255, 255, 0.25);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        flex-shrink: 0;
+    }
+
+    .floating-video-btn .btn-text {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.1;
+    }
+
+    .floating-video-btn .btn-text .label {
+        font-size: 12px;
+        font-weight: 600;
+        opacity: 0.9;
+    }
+
+    .floating-video-btn .btn-text .reward {
+        font-size: 16px;
+        font-weight: 800;
+    }
+
+    .floating-video-btn .badge {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background: #FFD700;
+        color: #333;
+        font-size: 10px;
+        font-weight: 800;
+        padding: 3px 8px;
+        border-radius: 20px;
+        animation: badgeBounce 1.5s ease-in-out infinite;
+    }
+
+    @keyframes floatPulse {
+        0%, 100% {
+            box-shadow: 0 8px 25px rgba(255, 65, 108, 0.5);
+        }
+        50% {
+            box-shadow: 0 8px 35px rgba(255, 65, 108, 0.8), 0 0 60px rgba(255, 75, 43, 0.3);
+        }
+    }
+
+    @keyframes badgeBounce {
+        0%, 100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-4px);
+        }
+    }
+
+    @media (max-width: 640px) {
+        .floating-video-btn {
+            bottom: 100px;
+            right: 12px;
+            padding: 10px 14px;
+            font-size: 12px;
+            gap: 6px;
+        }
+        .floating-video-btn .icon-circle {
+            width: 34px;
+            height: 34px;
+            font-size: 16px;
+        }
+        .floating-video-btn .btn-text .label {
+            font-size: 10px;
+        }
+        .floating-video-btn .btn-text .reward {
+            font-size: 14px;
+        }
     }
   </style>
 </head>
@@ -357,6 +469,7 @@
           <li><span class="highlight">সাইনআপ বোনাস:</span> নতুন ইউজার নিবন্ধন করার সাথে সাথে পান <strong>৫০ টাকা</strong>।</li>
           <li><span class="highlight">টেলিগ্রাম চ্যানেল জয়েন:</span> ৫০ টাকা</li>
           <li><span class="highlight">ইউটিউব সাবস্ক্রাইব:</span> ৫০ টাকা</li>
+          <li><span class="highlight">ভিডিও টাস্ক:</span> ৮ মিনিটের ভিডিও দেখে লাইক দিলে <strong>১০০ টাকা</strong> (দৈনিক ২ বার)</li>
           <li>প্রতিদিন ভোর ৬টায় দৈনিক বোনাস কাউন্ট রিসেট হয়। ঘন্টাভিত্তিক লিমিট রিসেট হয় প্রতি ঘন্টার শুরুতে।</li>
         </ul>
       </div>
@@ -386,6 +499,18 @@
       <p style="font-size: 12px; text-align: center; color: var(--text-dim); margin-top: 16px;">🇧🇩 দেশী ইনকাম – ঘরে বসে আয় করুন, সহজ ও নিরাপদ পদ্ধতি</p>
     </div>
   </div>
+
+  <!-- ========== FLOATING YOUTUBE VIDEO BUTTON ========== -->
+  <a href="video-task.html" class="floating-video-btn" title="ভিডিও দেখে ১০০ টাকা আয় করুন!">
+    <div class="icon-circle">
+      <i class="fab fa-youtube"></i>
+    </div>
+    <div class="btn-text">
+      <span class="label">ভিডিও দেখুন</span>
+      <span class="reward">১০০ টাকা</span>
+    </div>
+    <span class="badge">🔥 নতুন</span>
+  </a>
 
   <!-- Bottom Navigation -->
   <div class="bottom-nav">
@@ -427,7 +552,7 @@
     document.addEventListener('DOMContentLoaded', () => { 
       setTimeout(() => { updateHomeUI(); setInterval(updateHomeUI, 60000); }, 1000);
       
-      // 🟢 Rules Modal Logic (Big Visible Button for All)
+      // Rules Modal Logic
       const modal = document.getElementById('rulesModal');
       const showBtn = document.getElementById('showRulesBtn');
       const closeBtn = document.getElementById('closeRulesModal');
